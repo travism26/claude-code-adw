@@ -1,0 +1,5 @@
+{"gates": [
+  {"name": "compile", "command": "mvn -q -DskipTests compile"},
+  {"name": "unit", "command": "mvn -q test"},
+  {"name": "integration", "command": "mvn -q verify", "slow": true, "timeout_s": 1800}
+]}

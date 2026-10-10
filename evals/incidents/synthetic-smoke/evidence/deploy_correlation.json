@@ -1,0 +1,18 @@
+{
+  "changes": [
+    {
+      "sha": "e4f5a6b",
+      "ts": "2026-07-12T13:20:00Z",
+      "summary": "increase checkout-service redis connection pool size for Black Friday load",
+      "files": ["config/redis.yaml"],
+      "source": "git"
+    },
+    {
+      "sha": "synthetic-dd-change-01",
+      "ts": "2026-07-12T13:00:00Z",
+      "summary": "Datadog-recorded config change event: cache warm-up job scheduled",
+      "files": ["scripts/cache_warm.py"],
+      "source": "datadog"
+    }
+  ]
+}

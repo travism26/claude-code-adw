@@ -1,0 +1,23 @@
+id: 09-backend-photo-timeline
+target: backend
+plan_type: feature
+prompt: >
+  Add a GET /api/grows/:growId/photo-timeline endpoint to the Express
+  backend. It returns the grow's photo history as a chronologically sorted
+  array of entries { photoId, uploadedAt, analysisResult, healthScore },
+  built from the grow's logs and their photos/analyses (see the GrowLog,
+  GrowLogPhoto models and the existing photo analysis route in
+  src/routes/growLogs.ts). Include a top-level `trend` field computed from
+  the health scores: "improving", "declining", or "stable" (stable when
+  fewer than 2 scored photos or the change is small). Return 404 when the
+  grow doesn't exist or isn't owned by the authenticated user. Follow the
+  existing route -> service structure. Add mocha tests covering: sorted
+  multi-photo timeline, trend computation, empty timeline, and the 404
+  ownership case.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "grep -rqE 'photo-timeline' src/routes/"
+  - "grep -rqiE 'trend' src/routes/ src/services/ --include='*.ts' | head -1"
+  - "grep -rqE 'photo-timeline|photoTimeline|PhotoTimeline' src/tests/"
+  - "npx tsc --noEmit"
+judge_focus: "aggregation correctness (sort order, trend logic incl. edge cases), ownership authorization, and reuse of existing models/services vs reinvention"

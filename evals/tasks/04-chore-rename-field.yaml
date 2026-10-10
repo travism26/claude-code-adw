@@ -1,0 +1,14 @@
+id: 04-chore-rename-field
+plan_type: chore
+prompt: >
+  Rename the note field `body` to `content` everywhere in the notes app:
+  the Note dataclass, the store, the CLI flag (`--body` becomes `--content`),
+  display code, and all tests. Migrate gracefully: when loading a JSON file
+  that still uses the old `body` key, accept it and treat it as `content`.
+  All tests must pass after the rename.
+test_command: "uv run pytest -q"
+acceptance:
+  - "rm -f /tmp/eval04.json && uv run python -m app.notes --db /tmp/eval04.json add 'T' --content 'hello' >/dev/null && uv run python -m app.notes --db /tmp/eval04.json get 1 | grep -q 'hello'"
+  - "grep -q 'content' app/notes.py"
+  - "printf '[{\"id\": 1, \"title\": \"Old\", \"body\": \"legacy text\"}]' > /tmp/eval04b.json && uv run python -m app.notes --db /tmp/eval04b.json get 1 | grep -q 'legacy text'"
+judge_focus: "completeness of the rename across model/CLI/tests and the legacy-key migration path"

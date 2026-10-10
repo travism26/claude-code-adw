@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <ellipse cx="12" cy="14" rx="5" ry="6" fill="#EC4899" stroke="#2D3748" stroke-width="0.5"/>
+  <path d="M12 8 L11 6 Q12 4 13 6 Z" fill="#22C55E"/>
+  <ellipse cx="12" cy="13" rx="2" ry="2.5" fill="#fff" opacity="0.3"/>
+  <text x="12" y="16" font-size="5" text-anchor="middle" fill="#fff" font-weight="bold">Ra</text>
+</svg>

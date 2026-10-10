@@ -1,0 +1,30 @@
+{
+  "patterns": [
+    {
+      "pattern": "INFO redis GET key=cart:<ID> latency_ms=#",
+      "count": 118,
+      "exemplars": [
+        "INFO redis GET key=cart:9f2a1b8c latency_ms=4",
+        "INFO redis GET key=cart:7c31de55 latency_ms=6",
+        "INFO redis GET key=cart:0ab4419e latency_ms=5"
+      ]
+    },
+    {
+      "pattern": "WARN redis connection pool exhausted retries=#",
+      "count": 42,
+      "exemplars": [
+        "WARN redis connection pool exhausted retries=1",
+        "WARN redis connection pool exhausted retries=2",
+        "WARN redis connection pool exhausted retries=1"
+      ]
+    },
+    {
+      "pattern": "ERROR redis command timeout after <TS>",
+      "count": 7,
+      "exemplars": [
+        "ERROR redis command timeout after 2026-07-12T14:02:11Z",
+        "ERROR redis command timeout after 2026-07-12T14:03:47Z"
+      ]
+    }
+  ]
+}

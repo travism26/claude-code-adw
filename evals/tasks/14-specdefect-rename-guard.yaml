@@ -1,0 +1,28 @@
+id: 14-specdefect-rename-guard
+plan_type: feature
+target: app
+# Spec-defect tier (docs/spec-review-gate-plan.md §6.1): the prompt bundles
+# several requirements, one of which — the empty-title guard that must ALSO
+# leave the store unchanged — is the one a single-pass plan tends to under-spec
+# or drop. The held-out acceptance checks below test exactly that requirement,
+# so the gap shows up as a behavior failure, not just a spec wording nit.
+# Variant A (no gate) vs variant B (--review-spec): does the auto spec-critic
+# catch/repair the dropped guard, and does that raise downstream acceptance?
+tier: spec-defect
+prompt: >
+  Add a `rename <id> <new_title>` CLI command to the notes app that changes the
+  title of the note with the given id and prints "Renamed note <id>." on
+  success. It must error with exit code 1 (and a message on stderr) if no note
+  has that id. It must also reject an empty or whitespace-only new title: exit
+  code 1, a message on stderr, and the store must be left completely unchanged.
+  Keep all existing commands working and add pytest coverage for the successful
+  rename, the unknown-id error, and the empty-title rejection.
+test_command: "uv run pytest -q"
+acceptance:
+  # happy path: title actually changes and the success line is printed
+  - "rm -f /tmp/sd14.json && uv run python -m app.notes --db /tmp/sd14.json add 'Old' >/dev/null && uv run python -m app.notes --db /tmp/sd14.json rename 1 'New' | grep -q 'Renamed note 1' && uv run python -m app.notes --db /tmp/sd14.json get 1 | grep -q 'New'"
+  # unknown id must fail (non-zero exit)
+  - "rm -f /tmp/sd14b.json && uv run python -m app.notes --db /tmp/sd14b.json add 'Old' >/dev/null && ! uv run python -m app.notes --db /tmp/sd14b.json rename 999 'X' 2>/dev/null"
+  # held-out: empty title rejected AND original title preserved (store unchanged)
+  - "rm -f /tmp/sd14c.json && uv run python -m app.notes --db /tmp/sd14c.json add 'Keep' >/dev/null && ! uv run python -m app.notes --db /tmp/sd14c.json rename 1 '' 2>/dev/null && uv run python -m app.notes --db /tmp/sd14c.json get 1 | grep -q 'Keep'"
+judge_focus: "the empty-title guard and the store-unchanged-on-error behavior"

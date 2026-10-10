@@ -1,0 +1,15 @@
+id: 01-feature-tags
+plan_type: feature
+prompt: >
+  Add tag support to the notes app. Each note can have a list of string tags
+  (default: empty). Add two CLI capabilities, keeping all existing commands
+  working: (1) `tag-add <id> <tag>` — adds a tag to an existing note and
+  errors with exit code 1 if the note doesn't exist; (2) `list --tag <tag>` —
+  lists only notes carrying that tag. Persist tags in the JSON file. Add
+  pytest coverage for both behaviors.
+test_command: "uv run pytest -q"
+acceptance:
+  - "rm -f /tmp/eval01.json && uv run python -m app.notes --db /tmp/eval01.json add 'N1' >/dev/null && uv run python -m app.notes --db /tmp/eval01.json tag-add 1 work && uv run python -m app.notes --db /tmp/eval01.json list --tag work | grep -q 'N1'"
+  - "uv run python -m app.notes --db /tmp/eval01.json add 'N2' >/dev/null && uv run python -m app.notes --db /tmp/eval01.json list --tag work | grep -vq 'N2'"
+  - "grep -q 'tags' app/notes.py"
+judge_focus: "tag data model, persistence round-trip, and CLI wiring for tag-add / list --tag"

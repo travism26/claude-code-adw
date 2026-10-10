@@ -1,0 +1,248 @@
+paths:
+  /journal:
+    post:
+      tags:
+        - Journal
+      summary: Create journal entry
+      description: Create a new journal entry for a plant. User must own the plant.
+      operationId: createJournalEntry
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - plant_id
+              properties:
+                plant_id:
+                  type: string
+                  format: uuid
+                  description: ID of the plant this entry is about
+                note:
+                  type: string
+                  maxLength: 1000
+                  description: Journal entry text (optional)
+                  example: "Plant is looking healthy, new growth visible"
+                photo_url:
+                  type: string
+                  format: uri
+                  description: URL to photo (optional)
+                  example: "https://example.com/photos/journal1.jpg"
+      responses:
+        '201':
+          description: Journal entry created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Journal entry created successfully"
+                  entry:
+                    $ref: '../schemas/models.yaml#/components/schemas/JournalEntry'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Plant not found or access denied
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Plant not found or access denied"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /journal/plant/{plantId}:
+    get:
+      tags:
+        - Journal
+      summary: Get journal entries for plant
+      description: Retrieve all journal entries for a specific plant, ordered by entry date (newest first)
+      operationId: getPlantJournalEntries
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: plantId
+          in: path
+          required: true
+          description: Plant ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Journal entries retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entries:
+                    type: array
+                    items:
+                      $ref: '../schemas/models.yaml#/components/schemas/JournalEntry'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Plant not found or access denied
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /journal/{id}:
+    get:
+      tags:
+        - Journal
+      summary: Get single journal entry
+      description: Retrieve a specific journal entry by ID. User must own the associated plant.
+      operationId: getJournalEntry
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Journal entry ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Journal entry retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  entry:
+                    $ref: '../schemas/models.yaml#/components/schemas/JournalEntry'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Journal entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Journal entry not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Journal
+      summary: Update journal entry
+      description: Update a journal entry. User must own the associated plant. All fields are optional.
+      operationId: updateJournalEntry
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Journal entry ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+                  maxLength: 1000
+                  description: Updated journal entry text
+                  example: "Updated: Plant continues to thrive"
+                photo_url:
+                  type: string
+                  format: uri
+                  description: Updated photo URL
+                  example: "https://example.com/photos/journal-updated.jpg"
+      responses:
+        '200':
+          description: Journal entry updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Journal entry updated successfully"
+                  entry:
+                    $ref: '../schemas/models.yaml#/components/schemas/JournalEntry'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Journal entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Journal entry not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Journal
+      summary: Delete journal entry
+      description: Permanently delete a journal entry. User must own the associated plant.
+      operationId: deleteJournalEntry
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Journal entry ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Journal entry deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Journal entry deleted successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Journal entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Journal entry not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

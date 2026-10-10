@@ -1,0 +1,160 @@
+paths:
+  /zones/detect:
+    post:
+      tags:
+        - Zones
+      summary: Detect growing zone from postal code
+      description: Detect USDA hardiness zone based on provided postal code
+      operationId: detectZone
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - postal_code
+              properties:
+                postal_code:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                  description: Postal/ZIP code for zone detection
+                  example: "12345"
+      responses:
+        '200':
+          description: Zone detected successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  zone:
+                    type: string
+                    pattern: '^([1-9]|1[0-3])[ab]?$'
+                    description: Detected USDA hardiness zone
+                    example: "7a"
+                  postal_code:
+                    type: string
+                    description: The postal code that was queried
+                    example: "12345"
+        '400':
+          description: Could not detect zone or invalid postal code
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '../schemas/common.yaml#/components/schemas/Error'
+                  - $ref: '../schemas/common.yaml#/components/schemas/ValidationError'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                      postal_code:
+                        type: string
+              examples:
+                couldNotDetect:
+                  value:
+                    message: "Could not detect zone for the provided postal code"
+                    postal_code: "99999"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /zones/user:
+    get:
+      tags:
+        - Zones
+      summary: Get user's zone settings
+      description: Retrieve the authenticated user's growing zone, postal code, and override status
+      operationId: getUserZone
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: User zone settings retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  growing_zone:
+                    type: string
+                    nullable: true
+                    pattern: '^([1-9]|1[0-3])[ab]?$'
+                    example: "7a"
+                  postal_code:
+                    type: string
+                    nullable: true
+                    example: "12345"
+                  zone_override:
+                    type: boolean
+                    description: Whether zone was manually overridden
+                    example: false
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Zones
+      summary: Update user's zone
+      description: Update the user's growing zone and associated settings
+      operationId: updateUserZone
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - growing_zone
+              properties:
+                growing_zone:
+                  type: string
+                  pattern: '^([1-9]|1[0-3])[ab]?$'
+                  description: USDA hardiness zone (e.g., "6a", "7b", "10")
+                  example: "7a"
+                postal_code:
+                  type: string
+                  minLength: 3
+                  maxLength: 20
+                  description: Postal/ZIP code (optional)
+                  example: "12345"
+                zone_override:
+                  type: boolean
+                  description: Whether user manually overrode detected zone
+                  default: false
+      responses:
+        '200':
+          description: User zone updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  growing_zone:
+                    type: string
+                    example: "7a"
+                  postal_code:
+                    type: string
+                    nullable: true
+                    example: "12345"
+                  zone_override:
+                    type: boolean
+                    example: false
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

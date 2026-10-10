@@ -1,0 +1,105 @@
+paths:
+  /analysis-usage/today:
+    get:
+      tags:
+        - Analysis Usage
+      summary: Get today's usage statistics
+      description: Get AI analysis usage statistics for the authenticated user for today.
+      operationId: getTodayUsage
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Usage statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  analysesUsed:
+                    type: integer
+                    description: Number of analyses used today
+                    example: 3
+                  bonusAnalyses:
+                    type: integer
+                    description: Bonus analyses granted by admin
+                    example: 5
+                  dailyLimit:
+                    type: integer
+                    description: Daily analysis limit
+                    example: 10
+                  remaining:
+                    type: integer
+                    description: Remaining analyses available today
+                    example: 12
+                  usageDate:
+                    type: string
+                    format: date
+                    description: Date for this usage record
+                    example: "2024-01-15"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /analysis-usage/can-analyze:
+    get:
+      tags:
+        - Analysis Usage
+      summary: Check if user can perform analysis
+      description: |
+        Check if the authenticated user can perform an AI analysis.
+        Returns whether analysis is allowed and the reason if not.
+        Optionally checks for pending analyses for a specific garden.
+      operationId: checkCanAnalyze
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: gardenId
+          in: query
+          description: Optional garden ID for per-garden pending check
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Analysis availability checked successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  canAnalyze:
+                    type: boolean
+                    description: Whether user can perform an analysis
+                    example: true
+                  reason:
+                    type: string
+                    nullable: true
+                    description: Reason if analysis is not allowed
+                    enum:
+                      - null
+                      - "Daily analysis limit reached"
+                      - "Analysis already pending for this garden"
+                    example: null
+                  analysesUsed:
+                    type: integer
+                    description: Number of analyses used today
+                    example: 3
+                  bonusAnalyses:
+                    type: integer
+                    description: Bonus analyses available
+                    example: 5
+                  dailyLimit:
+                    type: integer
+                    description: Daily analysis limit
+                    example: 10
+                  remaining:
+                    type: integer
+                    description: Remaining analyses available
+                    example: 12
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

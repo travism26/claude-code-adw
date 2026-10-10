@@ -1,0 +1,271 @@
+/**
+ * Custom styles for react-big-calendar
+ * These override the default styles from react-big-calendar/lib/css/react-big-calendar.css
+ */
+
+.rbc-calendar {
+  font-family: inherit;
+}
+
+.rbc-header {
+  padding: 10px 3px;
+  font-weight: 600;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.rbc-today {
+  background-color: #edf2f7;
+}
+
+.rbc-event {
+  padding: 2px 5px;
+  font-size: 0.875rem;
+}
+
+.rbc-event-label {
+  font-size: 0.75rem;
+}
+
+.rbc-toolbar {
+  padding: 10px 0;
+  margin-bottom: 10px;
+}
+
+.rbc-toolbar button {
+  color: #2d3748;
+  border: 1px solid #cbd5e0;
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin: 0 2px;
+}
+
+.rbc-toolbar button:hover {
+  background-color: #edf2f7;
+}
+
+.rbc-toolbar button.rbc-active {
+  background-color: #3182ce;
+  color: white;
+  border-color: #3182ce;
+}
+
+.rbc-month-view {
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.rbc-time-view {
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+}
+
+.rbc-day-slot .rbc-time-slot {
+  border-top: 1px solid #f7fafc;
+}
+
+/* Calendar day numbers styling */
+.rbc-date-cell {
+  padding-right: 5px;
+  text-align: right;
+  position: relative;
+  z-index: 1;
+}
+
+.rbc-date-cell > a,
+.rbc-date-cell > button {
+  color: #2d3748;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.rbc-date-cell.rbc-now > a,
+.rbc-date-cell.rbc-now > button {
+  font-weight: 700;
+  color: #2b6cb0;
+}
+
+.rbc-off-range .rbc-date-cell > a,
+.rbc-off-range .rbc-date-cell > button {
+  color: #a0aec0;
+}
+
+/* Ensure the month rows have proper height */
+.rbc-month-row {
+  min-height: 100px;
+}
+
+/* Week and Day view time gutter */
+.rbc-time-gutter {
+  white-space: nowrap;
+}
+
+.rbc-timeslot-group {
+  min-height: 60px;
+}
+
+/* Ensure proper display of the calendar grid */
+.rbc-row-content {
+  position: relative;
+  z-index: 4;
+}
+
+.rbc-day-bg {
+  background-color: white;
+}
+
+.rbc-day-bg + .rbc-day-bg {
+  border-left: 1px solid #e2e8f0;
+}
+
+.rbc-month-row + .rbc-month-row {
+  border-top: 1px solid #e2e8f0;
+}
+
+/* Week and Day view styles */
+.rbc-time-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  min-height: 500px;
+  overflow: auto;
+}
+
+.rbc-time-header {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: row;
+}
+
+.rbc-time-header-content {
+  flex: 1;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  border-left: 1px solid #e2e8f0;
+}
+
+.rbc-time-content {
+  display: flex;
+  flex: 1 0 0%;
+  align-items: flex-start;
+  width: 100%;
+  border-top: 2px solid #e2e8f0;
+  overflow-y: auto;
+  position: relative;
+}
+
+.rbc-time-content > .rbc-time-gutter {
+  flex: none;
+}
+
+.rbc-time-content > * + * > * {
+  border-left: 1px solid #e2e8f0;
+}
+
+.rbc-time-column {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.rbc-time-column .rbc-timeslot-group {
+  flex: 1;
+}
+
+.rbc-day-slot {
+  position: relative;
+}
+
+.rbc-day-slot .rbc-events-container {
+  bottom: 0;
+  left: 0;
+  position: absolute;
+  right: 0;
+  margin-right: 10px;
+  top: 0;
+}
+
+.rbc-day-slot .rbc-event {
+  border: 1px solid #3182ce;
+  display: flex;
+  max-height: 100%;
+  min-height: 20px;
+  flex-flow: column wrap;
+  align-items: flex-start;
+  overflow: hidden;
+  position: absolute;
+}
+
+.rbc-time-gutter .rbc-timeslot-group {
+  padding: 0 5px;
+  text-align: right;
+  font-size: 0.75rem;
+  color: #718096;
+}
+
+.rbc-current-time-indicator {
+  position: absolute;
+  z-index: 3;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: #e53e3e;
+  pointer-events: none;
+}
+
+.rbc-current-time-indicator::before {
+  content: '';
+  position: absolute;
+  left: -6px;
+  top: -5px;
+  width: 12px;
+  height: 12px;
+  background-color: #e53e3e;
+  border-radius: 50%;
+}
+
+/* Day view header */
+.rbc-time-header.rbc-overflowing {
+  border-right: 1px solid #e2e8f0;
+}
+
+.rbc-label {
+  padding: 0 5px;
+}
+
+.rbc-allday-cell {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.rbc-row-bg {
+  display: flex;
+  flex-direction: row;
+  flex: 1 0 0;
+  overflow: hidden;
+}
+
+.rbc-row-segment {
+  padding: 0 1px 1px 1px;
+}
+
+.rbc-selected-cell {
+  background-color: rgba(49, 130, 206, 0.1);
+}
+
+.rbc-show-more {
+  background-color: transparent;
+  color: #3182ce;
+  font-weight: 600;
+  font-size: 0.75rem;
+  cursor: pointer;
+  padding: 2px 5px;
+}
+
+.rbc-show-more:hover {
+  background-color: #edf2f7;
+}

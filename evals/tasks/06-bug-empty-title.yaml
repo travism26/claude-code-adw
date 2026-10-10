@@ -1,0 +1,16 @@
+id: 06-bug-empty-title
+plan_type: bug
+prompt: >
+  The notes app currently accepts empty or whitespace-only titles
+  (`add ""` succeeds), creating unusable notes. Reject empty and
+  whitespace-only titles in both the NotesStore.add method (raise
+  ValueError) and the CLI (print a clear error to stderr and exit 1,
+  without writing anything to the store). Add pytest coverage for both
+  layers.
+test_command: "uv run pytest -q"
+acceptance:
+  - "rm -f /tmp/eval06.json && ! uv run python -m app.notes --db /tmp/eval06.json add '' 2>/dev/null"
+  - "! uv run python -m app.notes --db /tmp/eval06.json add '   ' 2>/dev/null"
+  - "test ! -s /tmp/eval06.json || test \"$(uv run python -c \"import json;print(len(json.load(open('/tmp/eval06.json'))))\")\" = '0'"
+  - "uv run python -m app.notes --db /tmp/eval06.json add 'Valid' | grep -q 'Added note 1'"
+judge_focus: "validation at both store and CLI layers, no partial writes on rejection"

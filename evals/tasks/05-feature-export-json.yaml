@@ -1,0 +1,15 @@
+id: 05-feature-export-json
+plan_type: feature
+prompt: >
+  Add an `export <file>` CLI command to the notes app that writes all notes
+  to the given path as pretty-printed JSON (an array of note objects,
+  identical shape to the store file). Print "Exported N notes to <file>."
+  on success. Error with exit code 1 if the destination directory does not
+  exist. Keep all existing commands working and add pytest coverage for a
+  successful export and the missing-directory error.
+test_command: "uv run pytest -q"
+acceptance:
+  - "rm -f /tmp/eval05.json /tmp/eval05_out.json && uv run python -m app.notes --db /tmp/eval05.json add 'E1' >/dev/null && uv run python -m app.notes --db /tmp/eval05.json export /tmp/eval05_out.json | grep -q 'Exported 1'"
+  - "uv run python -c \"import json; data=json.load(open('/tmp/eval05_out.json')); assert data[0]['title']=='E1'\""
+  - "! uv run python -m app.notes --db /tmp/eval05.json export /tmp/no_such_dir_xyz/out.json 2>/dev/null"
+judge_focus: "export format fidelity to the store schema and the error path"

@@ -1,0 +1,23 @@
+id: 08-backend-seasonal-tips-crud
+target: backend
+plan_type: feature
+prompt: >
+  The Express backend's seasonal tips API (src/routes/seasonalTips.ts) is
+  read-only. Add write endpoints: POST /api/seasonal-tips (create),
+  PATCH /api/seasonal-tips/:id (update tip_text, season, and/or priority),
+  and DELETE /api/seasonal-tips/:id. All three require an authenticated
+  user; validate that POST references an existing plant_profile_id (400
+  otherwise) and that PATCH/DELETE return 404 for unknown ids. Validate
+  season against the values the SeasonalTip model allows. Follow the
+  existing route -> service structure and express-validator patterns used
+  by neighboring routes. Add a mocha test file
+  src/tests/api/seasonalTips.test.ts covering create, update, delete, the
+  invalid plant_profile_id case, and 404s.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "grep -qE 'router\\.post' src/routes/seasonalTips.ts"
+  - "grep -qE 'router\\.patch' src/routes/seasonalTips.ts"
+  - "grep -qE 'router\\.delete' src/routes/seasonalTips.ts"
+  - "test -f src/tests/api/seasonalTips.test.ts"
+  - "npx tsc --noEmit"
+judge_focus: "full CRUD wiring through route+service layers, validation (plant_profile_id, season enum), and whether tests exercise error paths not just happy paths"

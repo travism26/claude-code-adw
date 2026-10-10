@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <circle cx="12" cy="14" r="6" fill="#D97706" stroke="#2D3748" stroke-width="0.5"/>
+  <path d="M12 8 L10 6 L12 4 L14 6 Z" fill="#22C55E"/>
+  <text x="12" y="15" font-size="6" text-anchor="middle" fill="#fff" font-weight="bold">SC</text>
+</svg>

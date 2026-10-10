@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude Code playbook — map</title>
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --muted: #5a5651;
+    --faint: #8a857e;
+    --rule: #e2ded7;
+    --paper: #fdfcfa;
+    --panel: #f6f4f0;
+    --good: #2f7d6f;
+    --warn: #c08422;
+    --bad: #b0503a;
+    --link: #2c5aa0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--paper); color: var(--ink);
+    font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  }
+  .wrap { max-width: 58rem; margin: 0 auto; padding: 3.5rem 1.75rem 5rem; }
+
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+  .eyebrow { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--faint); margin: 0 0 .8rem; }
+  h1 { font-size: 1.95rem; line-height: 1.2; margin: 0 0 .8rem; letter-spacing: -.02em; }
+  .standfirst { font-size: 1.05rem; color: var(--muted); margin: 0; max-width: 40rem; }
+
+  h2 {
+    font-size: 1.05rem; letter-spacing: .1em; text-transform: uppercase;
+    margin: 3rem 0 .4rem; color: var(--faint); font-weight: 650;
+  }
+  .h2sub { color: var(--muted); margin: 0 0 1.4rem; font-size: .95rem; max-width: 44rem; }
+  p { margin: 0 0 1rem; }
+  a { color: var(--link); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+  .start {
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 4px;
+    padding: 1.3rem 1.5rem; margin: 0 0 1rem;
+  }
+  .start h3 { margin: 0 0 .5rem; font-size: 1rem; }
+  .start p { margin: 0; color: var(--muted); font-size: .95rem; }
+  .start a { font-weight: 600; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(15.5rem, 1fr)); gap: .9rem; }
+  .card {
+    border: 1px solid var(--rule); border-radius: 4px; padding: .95rem 1.1rem;
+    background: #fff; display: flex; flex-direction: column;
+  }
+  .card .n { font-size: .68rem; letter-spacing: .12em; color: var(--faint); font-weight: 650; margin-bottom: .3rem; }
+  .card h3 { margin: 0 0 .4rem; font-size: 1rem; line-height: 1.3; }
+  .card h3 a { text-decoration: none; }
+  .card h3 a:hover { text-decoration: underline; }
+  .card p { margin: 0; font-size: .89rem; color: var(--muted); line-height: 1.5; }
+
+  .card.play .n { color: var(--good); }
+
+  figure { margin: 1.6rem 0 2rem; }
+  figcaption { font-size: .85rem; color: var(--muted); margin-top: .6rem; }
+  svg { display: block; width: 100%; height: auto; }
+
+  .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); gap: 1rem; margin: 1.4rem 0; }
+  .three div { border-left: 3px solid var(--good); padding-left: .9rem; }
+  .three strong { display: block; margin-bottom: .2rem; }
+  .three span { font-size: .9rem; color: var(--muted); }
+
+  .note {
+    border: 1px dashed var(--rule); border-radius: 4px; padding: 1rem 1.2rem;
+    margin: 2rem 0; font-size: .92rem; color: var(--muted);
+  }
+  .note strong { color: var(--ink); }
+
+  footer { margin-top: 3.5rem; padding-top: 1.4rem; border-top: 1px solid var(--rule); font-size: .9rem; color: var(--muted); }
+
+  @media print {
+    body { background: #fff; font-size: 11pt; }
+    .wrap { max-width: none; padding: 0; }
+    .card, .start, figure, .note { break-inside: avoid; }
+    a { color: var(--ink); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <p class="eyebrow">Practitioner guide</p>
+  <h1>Claude Code playbook</h1>
+  <p class="standfirst">How to get consistently good work out of a coding agent — and how to use
+  one across the rest of the job, not just while writing code.</p>
+</header>
+
+<div class="start">
+  <h3>New here? Start with <a href="adoption/getting-started.md">Getting started</a>.</h3>
+  <p>Half a day of setup, then a real feature in week two. Everything below is reference you can
+  read when its situation comes up.</p>
+</div>
+
+<!-- ── THE IDEA ── -->
+<h2>The idea in one picture</h2>
+<p class="h2sub">Agent output quality declines as material accumulates in a session — measurably,
+continuously, and long before any limit is hit. Every practice here follows from that.</p>
+
+<figure>
+  <svg viewBox="0 0 640 176" role="img" aria-labelledby="mt md">
+    <title id="mt">Quality declining with accumulated context, and the same work split into sessions</title>
+    <desc id="md">A quality curve falling across three shaded regions, with a second row showing
+    the same work divided into four short sessions that each stay in the first region.</desc>
+
+    <line x1="46" y1="112" x2="620" y2="112" stroke="#1a1a1a" stroke-width="1.2"/>
+    <line x1="46" y1="18"  x2="46"  y2="112" stroke="#1a1a1a" stroke-width="1.2"/>
+
+    <rect x="46"  y="18" width="196" height="94" fill="#2f7d6f" opacity=".10"/>
+    <rect x="242" y="18" width="86"  height="94" fill="#c08422" opacity=".14"/>
+    <rect x="328" y="18" width="292" height="94" fill="#b0503a" opacity=".09"/>
+
+    <path d="M46 28 C 150 32, 210 42, 242 54 C 290 74, 330 88, 400 98 C 480 107, 550 111, 620 113"
+          fill="none" stroke="#1a1a1a" stroke-width="2.2"/>
+
+    <text x="144" y="12" text-anchor="middle" font-size="11.5" font-weight="650" fill="#2f7d6f">smart zone</text>
+    <text x="285" y="12" text-anchor="middle" font-size="10.5" font-weight="650" fill="#c08422">drift</text>
+    <text x="474" y="12" text-anchor="middle" font-size="11.5" font-weight="650" fill="#b0503a">dumb zone</text>
+
+    <text x="18" y="66" font-size="11" fill="#5a5651" transform="rotate(-90 18 66)" text-anchor="middle">quality</text>
+    <text x="46" y="130" font-size="11" fill="#5a5651">start</text>
+    <text x="620" y="130" font-size="11" fill="#5a5651" text-anchor="end">window limit</text>
+
+    <rect x="46"  y="146" width="132" height="22" fill="#2f7d6f" opacity=".22"/>
+    <rect x="192" y="146" width="132" height="22" fill="#2f7d6f" opacity=".22"/>
+    <rect x="338" y="146" width="132" height="22" fill="#2f7d6f" opacity=".22"/>
+    <rect x="484" y="146" width="132" height="22" fill="#2f7d6f" opacity=".22"/>
+    <text x="112" y="161" font-size="10.5" text-anchor="middle" fill="#1a1a1a">ticket 1</text>
+    <text x="258" y="161" font-size="10.5" text-anchor="middle" fill="#1a1a1a">ticket 2</text>
+    <text x="404" y="161" font-size="10.5" text-anchor="middle" fill="#1a1a1a">ticket 3</text>
+    <text x="550" y="161" font-size="10.5" text-anchor="middle" fill="#1a1a1a">ticket 4</text>
+    <text x="0" y="161" font-size="10.5" fill="#5a5651">split →</text>
+  </svg>
+  <figcaption>Split the work so every unit runs in the first region. A written spec carries the
+  destination across the resets, which is what makes them lossless.</figcaption>
+</figure>
+
+<div class="three">
+  <div><strong>Clear between unrelated work</strong><span>Free, immediate, largest quality effect.</span></div>
+  <div><strong>Size work to one session</strong><span>Everything else is downstream of this.</span></div>
+  <div><strong>Write standards down</strong><span>Don't correct in chat. Only habit here that compounds.</span></div>
+</div>
+
+<!-- ── FOUNDATIONS ── -->
+<h2>Foundations</h2>
+<p class="h2sub">The constraints everything else obeys. Read in order — each builds on the last.</p>
+
+<div class="grid">
+  <div class="card">
+    <span class="n">01</span>
+    <h3><a href="foundations/01-context-economics.md">Context economics</a></h3>
+    <p>What actually degrades, what the published evidence supports, and what it doesn't. Includes
+    two things not to say out loud.</p>
+  </div>
+  <div class="card">
+    <span class="n">02</span>
+    <h3><a href="foundations/02-context-diet.md">The context diet</a></h3>
+    <p>Cutting the baseline you pay on every session. Opt out, never blind — and why relevance
+    matters more than raw size.</p>
+  </div>
+  <div class="card">
+    <span class="n">03</span>
+    <h3><a href="foundations/03-session-lifecycle.md">Session lifecycle</a></h3>
+    <p>Clear, compact, or continue. Why writing things down is what makes throwing a session away
+    cheap.</p>
+  </div>
+  <div class="card">
+    <span class="n">04</span>
+    <h3><a href="foundations/04-orchestration-and-delegation.md">Orchestration &amp; delegation</a></h3>
+    <p>Sub-agents, model tiering, self-verifying prompts — and the three places delegation stops
+    working.</p>
+  </div>
+  <div class="card">
+    <span class="n">05</span>
+    <h3><a href="foundations/05-where-steering-lives.md">Where steering lives</a></h3>
+    <p>Why coding standards belong in review rather than in implementation, and the habit that
+    makes them accumulate.</p>
+  </div>
+  <div class="card">
+    <span class="n">06</span>
+    <h3><a href="foundations/06-access-principle.md">The access principle</a></h3>
+    <p>Give the agent what the human can read. The security trade-off argued honestly, with six
+    scoping rules and a rollout order.</p>
+  </div>
+</div>
+
+<!-- ── PLAYS ── -->
+<h2>Plays</h2>
+<p class="h2sub">Five ways to use an agent. Read each when its situation arises — the feature
+workflow is one play, not the whole job.</p>
+
+<div class="grid">
+  <div class="card play">
+    <span class="n">PLAY 01</span>
+    <h3><a href="plays/01-feature-delivery.md">Feature delivery</a></h3>
+    <p>Grill → spec → tickets → implement → review. Includes the position on spec-driven
+    development, and when this play is the wrong tool.</p>
+  </div>
+  <div class="card play">
+    <span class="n">PLAY 02</span>
+    <h3><a href="plays/02-product-intake.md">Product intake</a></h3>
+    <p>Meeting transcripts into tickets plus ambiguities, by reconciling what was said against
+    what the code does.</p>
+  </div>
+  <div class="card play">
+    <span class="n">PLAY 03</span>
+    <h3><a href="plays/03-incident-response.md">Incident response</a></h3>
+    <p>First-pass analysis before a human arrives. Read-only, and why that's the design rather
+    than a limitation.</p>
+  </div>
+  <div class="card play">
+    <span class="n">PLAY 04</span>
+    <h3><a href="plays/04-debugging.md">Debugging</a></h3>
+    <p>The unknown-destination loop. Delegate the looking, keep the thinking.</p>
+  </div>
+  <div class="card play">
+    <span class="n">PLAY 05</span>
+    <h3><a href="plays/05-ci-and-build-feedback.md">CI &amp; build feedback</a></h3>
+    <p>The cheapest useful access to grant, and usually the first thing to install.</p>
+  </div>
+</div>
+
+<!-- ── KIT ── -->
+<h2>Starter kit</h2>
+<p class="h2sub">Templates to adapt, not to copy wholesale.</p>
+
+<div class="grid">
+  <div class="card">
+    <h3><a href="examples/settings.json">settings.json</a></h3>
+    <p>Annotated context diet. Not valid JSON as written — deliberately, so it gets read and
+    decided on.</p>
+  </div>
+  <div class="card">
+    <h3><a href="examples/CODING_STANDARDS.md">CODING_STANDARDS.md</a></h3>
+    <p>Seed file. One line is a legitimate start.</p>
+  </div>
+  <div class="card">
+    <h3><a href="examples/skills/delegate/SKILL.md">delegate skill</a></h3>
+    <p>Tiering table, six rules, prompt skeleton, worked example.</p>
+  </div>
+  <div class="card">
+    <h3><a href="examples/skills/groom-transcript/SKILL.md">groom-transcript skill</a></h3>
+    <p>Overlapping fan-out, code reconciliation, ambiguity ranking.</p>
+  </div>
+</div>
+
+<!-- ── REFERENCE ── -->
+<h2>Reference</h2>
+<div class="grid">
+  <div class="card">
+    <h3><a href="glossary.md">Glossary</a></h3>
+    <p>Smart zone, spec, ticket, seam, handoff artifact, model tiering, and the rest — defined once.</p>
+  </div>
+</div>
+
+<div class="note">
+  <p style="margin:0"><strong>On evidence.</strong> There are no performance percentages anywhere
+  in this playbook, because none could be defended. Chapter 01 sets out what the
+  published research actually establishes, what is a reasonable extrapolation, and what is
+  unsupported — including the fact that degradation is well documented for retrieval and
+  reasoning tasks but thinly evidenced for multi-turn agentic coding specifically. Adopt these
+  practices because the mechanism is sound and they are cheap, not because someone quoted you a
+  number.</p>
+</div>
+
+<footer>
+  <p style="margin:0">Self-contained. No build step, no network required.</p>
+</footer>
+
+</div>
+</body>
+</html>

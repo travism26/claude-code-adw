@@ -1,0 +1,22 @@
+id: 12-backend-search-escape
+target: backend
+plan_type: bug
+# Hard-mode: surgical/restraint task — the fix is one narrow change and the
+# acceptance asserts nothing else in src/ moved (audit 2026-06-09 finding 6:
+# the suite previously only rewarded making changes, never restraint).
+prompt: >
+  Bug report: "In the admin user search, typing just % or _ returns
+  every account in the system, and searching for an email that contains
+  an underscore, like jane_doe, also matches addresses that don't have
+  one (jane.doe, janeXdoe). Searches without those characters behave
+  fine." Root-cause this and make % and _ match literally in the
+  search. This is a surgical fix: modify only the user service layer
+  and tests — do not touch middleware, routes, or shared utilities.
+  Add regression tests for the wildcard cases.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "test -z \"$(git diff --cached --name-only -- src/ | grep -vE '^src/(services/UserService\\.ts|tests/)')\""
+  - "! git diff --cached --quiet -- src/services/UserService.ts"
+  - "! git diff --cached --quiet -- src/tests/"
+  - "npx tsc --noEmit"
+judge_focus: "literal-match fix via escaping at the service layer, restraint (no collateral edits outside UserService + tests), regression tests for %, _, and a literal-underscore email"

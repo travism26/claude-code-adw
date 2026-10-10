@@ -1,0 +1,203 @@
+paths:
+  /care-history:
+    get:
+      tags:
+        - Care History
+      summary: Get all care history with filters
+      description: |
+        Retrieve care history for the authenticated user with optional filters.
+        Supports filtering by action type and date range.
+      operationId: listCareHistory
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: action_type
+          in: query
+          description: Filter by action type
+          schema:
+            type: string
+            enum: [water, fertilize, prune, harvest, transplant, pest_control, other]
+        - name: start_date
+          in: query
+          description: Filter entries on or after this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+            example: "2024-01-01T00:00:00Z"
+        - name: end_date
+          in: query
+          description: Filter entries on or before this date (ISO 8601)
+          schema:
+            type: string
+            format: date-time
+            example: "2024-01-31T23:59:59Z"
+        - name: limit
+          in: query
+          description: Maximum number of entries to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 50
+      responses:
+        '200':
+          description: Care history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/models.yaml#/components/schemas/CareHistory'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Care History
+      summary: Log a care action
+      description: |
+        Create a new care history entry for a plant.
+        Automatically updates plant's last_watered or last_fertilized timestamps for water/fertilize actions.
+      operationId: createCareHistory
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - plant_id
+                - action_type
+              properties:
+                plant_id:
+                  type: string
+                  format: uuid
+                  description: ID of the plant this care action is for
+                action_type:
+                  type: string
+                  enum: [water, fertilize, prune, harvest, transplant, pest_control, other]
+                  description: Type of care action performed
+                  example: "water"
+                action_date:
+                  type: string
+                  format: date-time
+                  description: When the action was performed (defaults to now)
+                  example: "2024-01-15T10:30:00Z"
+                notes:
+                  type: string
+                  maxLength: 1000
+                  description: Optional notes about the care action
+                  example: "Watered thoroughly, soil was quite dry"
+      responses:
+        '201':
+          description: Care action logged successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/models.yaml#/components/schemas/CareHistory'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Plant not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Plant not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /care-history/plant/{plantId}:
+    get:
+      tags:
+        - Care History
+      summary: Get care history for specific plant
+      description: Retrieve all care history entries for a specific plant, ordered by action date (newest first)
+      operationId: getPlantCareHistory
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: plantId
+          in: path
+          required: true
+          description: Plant ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Plant care history retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/models.yaml#/components/schemas/CareHistory'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Plant not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Plant not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /care-history/{id}:
+    delete:
+      tags:
+        - Care History
+      summary: Delete care history entry
+      description: Permanently delete a care history entry. User must own the associated plant.
+      operationId: deleteCareHistory
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Care history entry ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Care history entry deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Care history entry deleted"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Care history entry not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Care history entry not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

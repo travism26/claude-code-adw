@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "repos": [
+    {
+      "name": "backend",
+      "path": "../backend",
+      "base_branch": "origin/main",
+      "enabled": true,
+      "plan_type": "feature",
+      "order": 1
+    },
+    {
+      "name": "frontend",
+      "path": "../frontend",
+      "enabled": true,
+      "plan_type": "feature",
+      "order": 2
+    },
+    {
+      "name": "infra",
+      "path": "/abs/path/to/infra",
+      "enabled": false,
+      "plan_type": "chore",
+      "order": 3
+    }
+  ]
+}

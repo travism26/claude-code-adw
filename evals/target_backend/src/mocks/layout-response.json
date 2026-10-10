@@ -1,0 +1,307 @@
+{
+  "layouts": [
+    {
+      "id": "layout_1",
+      "optimizationGoal": "max_yield",
+      "placements": [
+        {
+          "plantProfileId": "e4a6b1ea-5001-4ee7-90d0-605014be689c",
+          "plantName": "Cantaloupe",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 6.0,
+          "height": 3.0,
+          "quantity": 2,
+          "reasoning": "Cantaloupe requires significant space; placed on the north side to allow spread without shading. Intensive spacing allows for two plants."
+        },
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 7.0,
+          "y": 0.0,
+          "width": 4.0,
+          "height": 4.0,
+          "quantity": 1,
+          "reasoning": "Blueberry placed in northeast corner for maximum sun exposure and minimal shading of other plants."
+        },
+        {
+          "plantProfileId": "9b85c87a-68e5-4633-94b6-309b400ce599",
+          "plantName": "Broccoli",
+          "x": 0.0,
+          "y": 4.0,
+          "width": 3.0,
+          "height": 1.5,
+          "quantity": 4,
+          "reasoning": "Broccoli in row formation for efficient harvesting and good air circulation."
+        },
+        {
+          "plantProfileId": "4e5d45e7-70e2-4360-bd15-7222ca8419dd",
+          "plantName": "Bell Pepper",
+          "x": 4.0,
+          "y": 4.0,
+          "width": 3.0,
+          "height": 1.5,
+          "quantity": 4,
+          "reasoning": "Bell peppers placed near broccoli; both are heavy feeders with similar water needs."
+        },
+        {
+          "plantProfileId": "ea685525-5e2d-4c35-aa22-16a1a751c01d",
+          "plantName": "Basil",
+          "x": 8.0,
+          "y": 4.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 4,
+          "reasoning": "Basil companion planted with peppers to deter pests and enhance flavor."
+        },
+        {
+          "plantProfileId": "3ae27b88-227b-488e-8f47-5f09e07bc184",
+          "plantName": "Carrot",
+          "x": 0.0,
+          "y": 6.0,
+          "width": 4.0,
+          "height": 1.0,
+          "quantity": 48,
+          "reasoning": "Carrots in dense row; intensive spacing with 3-inch spacing allows many plants in small area."
+        },
+        {
+          "plantProfileId": "8709950e-6881-430d-a6e2-577b46f590ef",
+          "plantName": "Garlic",
+          "x": 5.0,
+          "y": 6.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 16,
+          "reasoning": "Garlic planted near carrots; acts as pest deterrent and shares similar growing conditions."
+        },
+        {
+          "plantProfileId": "75255f3a-938b-4540-ba78-3669509c90fd",
+          "plantName": "Chives",
+          "x": 8.0,
+          "y": 6.0,
+          "width": 1.5,
+          "height": 1.0,
+          "quantity": 6,
+          "reasoning": "Chives at edge of bed for easy access; beneficial companion for many vegetables."
+        },
+        {
+          "plantProfileId": "2f5df524-45d4-45dd-9b2b-490e1ecff847",
+          "plantName": "Dill",
+          "x": 0.0,
+          "y": 8.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 4,
+          "reasoning": "Dill at south end where it won't shade other plants; beneficial for carrots."
+        }
+      ],
+      "score": 88,
+      "companionScore": 85,
+      "spacingScore": 90,
+      "accessibilityScore": 89,
+      "warnings": []
+    },
+    {
+      "id": "layout_2",
+      "optimizationGoal": "max_variety",
+      "placements": [
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 4.0,
+          "height": 4.0,
+          "quantity": 1,
+          "reasoning": "Single blueberry bush as anchor plant in northwest corner."
+        },
+        {
+          "plantProfileId": "e4a6b1ea-5001-4ee7-90d0-605014be689c",
+          "plantName": "Cantaloupe",
+          "x": 5.0,
+          "y": 0.0,
+          "width": 5.0,
+          "height": 3.0,
+          "quantity": 1,
+          "reasoning": "One cantaloupe plant with room to sprawl along north edge."
+        },
+        {
+          "plantProfileId": "9b85c87a-68e5-4633-94b6-309b400ce599",
+          "plantName": "Broccoli",
+          "x": 0.0,
+          "y": 5.0,
+          "width": 2.0,
+          "height": 1.5,
+          "quantity": 2,
+          "reasoning": "Two broccoli plants for variety without taking too much space."
+        },
+        {
+          "plantProfileId": "4e5d45e7-70e2-4360-bd15-7222ca8419dd",
+          "plantName": "Bell Pepper",
+          "x": 3.0,
+          "y": 5.0,
+          "width": 2.0,
+          "height": 1.5,
+          "quantity": 2,
+          "reasoning": "Two pepper plants in central location for balanced layout."
+        },
+        {
+          "plantProfileId": "ea685525-5e2d-4c35-aa22-16a1a751c01d",
+          "plantName": "Basil",
+          "x": 6.0,
+          "y": 5.0,
+          "width": 1.5,
+          "height": 1.0,
+          "quantity": 2,
+          "reasoning": "Basil near peppers as beneficial companion."
+        },
+        {
+          "plantProfileId": "75255f3a-938b-4540-ba78-3669509c90fd",
+          "plantName": "Chives",
+          "x": 8.0,
+          "y": 5.0,
+          "width": 1.0,
+          "height": 1.0,
+          "quantity": 2,
+          "reasoning": "Chives at edge for easy snipping access."
+        },
+        {
+          "plantProfileId": "3ae27b88-227b-488e-8f47-5f09e07bc184",
+          "plantName": "Carrot",
+          "x": 0.0,
+          "y": 7.0,
+          "width": 3.0,
+          "height": 1.0,
+          "quantity": 24,
+          "reasoning": "Moderate carrot planting for variety focus."
+        },
+        {
+          "plantProfileId": "8709950e-6881-430d-a6e2-577b46f590ef",
+          "plantName": "Garlic",
+          "x": 4.0,
+          "y": 7.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 12,
+          "reasoning": "Garlic cluster near carrots for pest protection."
+        },
+        {
+          "plantProfileId": "2f5df524-45d4-45dd-9b2b-490e1ecff847",
+          "plantName": "Dill",
+          "x": 7.0,
+          "y": 7.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 3,
+          "reasoning": "Dill at edge for easy access and carrot companionship."
+        }
+      ],
+      "score": 85,
+      "companionScore": 88,
+      "spacingScore": 82,
+      "accessibilityScore": 85,
+      "warnings": []
+    },
+    {
+      "id": "layout_3",
+      "optimizationGoal": "beginner_friendly",
+      "placements": [
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 5.0,
+          "height": 5.0,
+          "quantity": 1,
+          "reasoning": "Extra space around blueberry for beginner-friendly maintenance access."
+        },
+        {
+          "plantProfileId": "e4a6b1ea-5001-4ee7-90d0-605014be689c",
+          "plantName": "Cantaloupe",
+          "x": 6.0,
+          "y": 0.0,
+          "width": 6.0,
+          "height": 4.0,
+          "quantity": 1,
+          "reasoning": "Generous space for cantaloupe vines with clear boundaries."
+        },
+        {
+          "plantProfileId": "9b85c87a-68e5-4633-94b6-309b400ce599",
+          "plantName": "Broccoli",
+          "x": 0.0,
+          "y": 6.0,
+          "width": 3.0,
+          "height": 2.0,
+          "quantity": 2,
+          "reasoning": "Conservative broccoli spacing for easier pest management."
+        },
+        {
+          "plantProfileId": "4e5d45e7-70e2-4360-bd15-7222ca8419dd",
+          "plantName": "Bell Pepper",
+          "x": 4.0,
+          "y": 6.0,
+          "width": 3.0,
+          "height": 2.0,
+          "quantity": 2,
+          "reasoning": "Peppers with room to grow; forgiving spacing for beginners."
+        },
+        {
+          "plantProfileId": "ea685525-5e2d-4c35-aa22-16a1a751c01d",
+          "plantName": "Basil",
+          "x": 8.0,
+          "y": 6.0,
+          "width": 2.0,
+          "height": 2.0,
+          "quantity": 3,
+          "reasoning": "Easy-to-grow basil with plenty of space between plants."
+        },
+        {
+          "plantProfileId": "3ae27b88-227b-488e-8f47-5f09e07bc184",
+          "plantName": "Carrot",
+          "x": 0.0,
+          "y": 9.0,
+          "width": 3.0,
+          "height": 1.5,
+          "quantity": 20,
+          "reasoning": "Moderate carrot density for easier thinning and harvesting."
+        },
+        {
+          "plantProfileId": "8709950e-6881-430d-a6e2-577b46f590ef",
+          "plantName": "Garlic",
+          "x": 4.0,
+          "y": 9.0,
+          "width": 2.0,
+          "height": 1.5,
+          "quantity": 8,
+          "reasoning": "Garlic is very forgiving and requires minimal care."
+        },
+        {
+          "plantProfileId": "75255f3a-938b-4540-ba78-3669509c90fd",
+          "plantName": "Chives",
+          "x": 7.0,
+          "y": 9.0,
+          "width": 1.5,
+          "height": 1.5,
+          "quantity": 3,
+          "reasoning": "Chives are nearly impossible to kill - perfect for beginners."
+        },
+        {
+          "plantProfileId": "2f5df524-45d4-45dd-9b2b-490e1ecff847",
+          "plantName": "Dill",
+          "x": 9.0,
+          "y": 9.0,
+          "width": 2.0,
+          "height": 1.5,
+          "quantity": 2,
+          "reasoning": "Dill reseeds itself; minimal maintenance required."
+        }
+      ],
+      "score": 82,
+      "companionScore": 80,
+      "spacingScore": 95,
+      "accessibilityScore": 90,
+      "warnings": []
+    }
+  ]
+}

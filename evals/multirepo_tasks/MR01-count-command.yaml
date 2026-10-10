@@ -1,0 +1,29 @@
+id: MR01-count-command
+# One cross-cutting ticket handed INDEPENDENTLY to each repo. Each repo runs its
+# own full SDLC (its own .claude/ + plan) against the same prompt, in its own
+# worktree — there is no shared spec. This exercises travis_multirepo's
+# orchestration: per-repo isolation, independent plans, per-repo acceptance.
+ticket: >
+  Add a `count` subcommand to the CLI that prints the total number of stored
+  items as a single integer on its own line (and nothing else), respecting the
+  --db option. Keep all existing commands working, and add a pytest covering the
+  new behavior.
+
+repos:
+  - name: notes
+    target: app          # evals/target_app — notes CLI
+    plan_type: feature
+    test_command: "uv run --with pytest pytest -q"
+    acceptance:
+      - "rm -f /tmp/mr01_notes.json && uv run python -m app.notes --db /tmp/mr01_notes.json add 'A' >/dev/null && uv run python -m app.notes --db /tmp/mr01_notes.json add 'B' >/dev/null && [ \"$(uv run python -m app.notes --db /tmp/mr01_notes.json count)\" = \"2\" ]"
+      - "rm -f /tmp/mr01_notes0.json && [ \"$(uv run python -m app.notes --db /tmp/mr01_notes0.json count)\" = \"0\" ]"
+
+  - name: kv
+    target: cli          # evals/target_cli — key/value CLI
+    plan_type: feature
+    test_command: "uv run --with pytest pytest -q"
+    acceptance:
+      - "rm -f /tmp/mr01_kv.json && uv run python -m app.kv --db /tmp/mr01_kv.json set x 1 >/dev/null && uv run python -m app.kv --db /tmp/mr01_kv.json set y 2 >/dev/null && [ \"$(uv run python -m app.kv --db /tmp/mr01_kv.json count)\" = \"2\" ]"
+      - "rm -f /tmp/mr01_kv0.json && [ \"$(uv run python -m app.kv --db /tmp/mr01_kv0.json count)\" = \"0\" ]"
+
+judge_focus: "a count subcommand wired into the existing CLI with correct --db handling and a test"

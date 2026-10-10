@@ -1,0 +1,33 @@
+{
+  "body": "Spec: `docs/epics/csv-export/spec.md`\n\n## What to build\n\nOne end-to-end test that walks the CSV export feature the way an operator uses it: request an export, download it, run it again, keep one copy, delete the other. It runs over real storage with a fake only at the object-store edge, and checks at the end that the deleted export's database row and its CSV file are both gone.\n\nThen the failures that belong to no single ticket: the worker killed mid-export, the bucket credential revoked between runs, and a disk that cannot be written to. Each must fail closed: the operator sees a message that says what to do, and no export visible to her is missing its file.\n\n## Acceptance criteria\n\n- [ ] The end-to-end test runs the full loop over real storage and passes\n- [ ] After a delete, both the row and the CSV file are gone\n- [ ] A worker killed mid-export never leaves an export that downloads nothing; a file with no row is tolerated\n- [ ] A revoked credential or an unwritable disk is reported in plain words and leaves nothing half-visible\n- [ ] Tests check observable behaviour, not call sequences\n\n## Sequencing\n\nThe row is written before the file, so an interruption between the two can leave a file with no row. That is recoverable and is not asserted against. The inverse, a row whose file is absent, must be unreachable.\n\n## Blocked by\n\n- #57\n- #85\n- #86\n",
+  "labels": [
+    {
+      "id": "LA_kwDOFAKE00000000000003",
+      "name": "ready-for-agent",
+      "description": "Fully specified, ready for an AFK agent",
+      "color": "0e8a16"
+    }
+  ],
+  "number": 58,
+  "state": "OPEN",
+  "title": "Export tracer + cross-cutting failure paths",
+  "url": "https://github.com/acme/widgets/issues/58",
+  "blockers": {
+    "57": {
+      "number": 57,
+      "state": "OPEN",
+      "title": "Rate limiter rejects burst uploads"
+    },
+    "85": {
+      "number": 85,
+      "state": "CLOSED",
+      "title": "Export operations module: delete and download resolution behind one owner"
+    },
+    "86": {
+      "number": 86,
+      "state": "CLOSED",
+      "title": "Export operations module: replace, closing the two-write window"
+    }
+  },
+  "native_blocked_by": []
+}

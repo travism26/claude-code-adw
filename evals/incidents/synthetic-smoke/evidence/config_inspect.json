@@ -1,0 +1,9 @@
+{
+  "files": [
+    {
+      "repo": "org/redis-synthetic-service",
+      "path": "config/redis.yaml",
+      "excerpt": "maxmemory-policy: allkeys-lru\npool_size: 20\nttl_seconds: 300\nmax_connections: 50"
+    }
+  ]
+}

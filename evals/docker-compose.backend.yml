@@ -1,0 +1,35 @@
+# Services for the realistic eval tier (evals/target_backend).
+# Managed by evals/run_eval.py — started before backend-target trials,
+# torn down after (only if the eval started them).
+#
+# Host ports come from env so the eval can shift away from a developer's
+# local postgres/redis: ADW_EVAL_PG_PORT (default 5432),
+# ADW_EVAL_REDIS_PORT (default 6379).
+name: adw-eval-backend
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: growbuddy_test_0
+    ports:
+      - "${ADW_EVAL_PG_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+    tmpfs:
+      - /var/lib/postgresql/data   # throwaway data — trials recreate the DB anyway
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "${ADW_EVAL_REDIS_PORT:-6379}:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 3s
+      retries: 20

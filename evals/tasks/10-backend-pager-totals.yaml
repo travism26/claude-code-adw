@@ -1,0 +1,23 @@
+id: 10-backend-pager-totals
+target: backend
+plan_type: bug
+# Hard-mode: vague-symptom bug. The planted defect (committed in the vendored
+# backend, off the code paths of tasks 07-09 and invisible to the existing
+# suite) is load-bearing — do not fix it in evals/target_backend/.
+prompt: >
+  Bug report from the admin dashboard team: "On a fresh install with a
+  handful of users, the user list shows rows but the pager underneath
+  renders zero pages. On staging, which has 25 users, the pager offers a
+  single page and the oldest five accounts can never be reached from it.
+  The rows that do appear are correct — it's the pager that is wrong."
+  The dashboard is a thin client and renders exactly the page controls
+  the backend API tells it to. Find the root cause in the backend, fix
+  it, and add regression tests that would have caught this — cover both
+  a total smaller than one page and a total that is not an exact
+  multiple of the page size.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "! grep -qE 'Math\\.floor\\(total / limit\\)' src/routes/admin.ts"
+  - "grep -qi 'totalPages' src/tests/api/admin.test.ts"
+  - "npx tsc --noEmit"
+judge_focus: "root-cause diagnosis from the symptom alone (pagination metadata, not the row query), a minimal fix, and regression tests covering total<limit and a non-multiple total"

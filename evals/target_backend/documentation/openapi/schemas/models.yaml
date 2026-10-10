@@ -1,0 +1,652 @@
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        email:
+          type: string
+          format: email
+          example: "gardener@example.com"
+        timezone:
+          type: string
+          description: IANA timezone identifier
+          example: "America/New_York"
+        growing_zone:
+          type: string
+          nullable: true
+          pattern: '^([1-9]|1[0-3])[ab]?$'
+          description: USDA hardiness zone (e.g., "6a", "7b", "10")
+          example: "7a"
+        postal_code:
+          type: string
+          nullable: true
+          example: "12345"
+        zone_override:
+          type: boolean
+          description: Whether user manually overrode detected zone
+          default: false
+        ai_analysis_enabled:
+          type: boolean
+          description: Whether AI analysis is enabled for this user
+          default: true
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Plant:
+      type: object
+      required:
+        - id
+        - user_id
+        - name
+        - type
+        - water_interval_days
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        name:
+          type: string
+          minLength: 1
+          example: "My Tomato Plant"
+        species:
+          type: string
+          nullable: true
+          example: "Solanum lycopersicum"
+        type:
+          type: string
+          enum: [indoor, outdoor]
+          example: "outdoor"
+        water_interval_days:
+          type: integer
+          minimum: 1
+          maximum: 365
+          example: 3
+        fert_interval_days:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 365
+          example: 14
+        last_watered:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-01-15T10:30:00.000Z"
+        last_fertilized:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-01-10T09:00:00.000Z"
+        photo_url:
+          type: string
+          format: uri
+          nullable: true
+          example: "https://example.com/photos/plant.jpg"
+        plant_profile_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    PlantProfile:
+      type: object
+      required:
+        - id
+        - name
+        - type
+        - default_water_interval_days
+        - difficulty
+        - indoor_outdoor
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        name:
+          type: string
+          minLength: 1
+          example: "Tomato"
+        species:
+          type: string
+          nullable: true
+          example: "Solanum lycopersicum"
+        common_name:
+          type: string
+          nullable: true
+          example: "Garden Tomato"
+        type:
+          type: string
+          enum: [vegetable, herb, flower, houseplant, fruit, tree, succulent, vine]
+          example: "vegetable"
+        default_water_interval_days:
+          type: integer
+          minimum: 1
+          maximum: 365
+          example: 3
+        default_fert_interval_days:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 365
+          example: 14
+        zone_min:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 13
+          example: 3
+        zone_max:
+          type: integer
+          nullable: true
+          minimum: 1
+          maximum: 13
+          example: 11
+        sunlight_requirements:
+          type: string
+          enum: [full_sun, partial_sun, partial_shade, full_shade]
+          nullable: true
+          example: "full_sun"
+        soil_type:
+          type: string
+          nullable: true
+          example: "Well-drained loamy soil"
+        spacing_inches:
+          type: integer
+          nullable: true
+          minimum: 0
+          example: 24
+        plant_family:
+          type: string
+          nullable: true
+          example: "Solanaceae"
+        description:
+          type: string
+          nullable: true
+          example: "A popular warm-season crop that produces flavorful fruits"
+        difficulty:
+          type: string
+          enum: [easy, moderate, challenging]
+          example: "moderate"
+        indoor_outdoor:
+          type: string
+          enum: [indoor, outdoor, both]
+          example: "outdoor"
+        icon_url:
+          type: string
+          nullable: true
+          pattern: '^/plant-icons/(vegetable|herb|flower|houseplant|fruit|tree|succulent|vine|default)/[a-z0-9-]+\.(svg|png)$'
+          example: "/plant-icons/vegetable/tomato.svg"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    SeasonalTip:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_profile_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        zone:
+          type: string
+          pattern: '^([1-9]|1[0-3])[ab]?$'
+          example: "7a"
+        season:
+          type: string
+          enum: [spring, summer, fall, winter]
+          example: "spring"
+        tip:
+          type: string
+          example: "Plant seedlings after last frost date"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Garden:
+      type: object
+      required:
+        - id
+        - user_id
+        - name
+        - width
+        - height
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+          example: "Backyard Garden"
+        zone:
+          type: string
+          nullable: true
+          pattern: '^([0-9]|1[0-3])[ab]?$'
+          example: "7a"
+        width:
+          type: number
+          format: decimal
+          minimum: 0.1
+          maximum: 10000
+          example: 20
+          description: Garden width in feet
+        height:
+          type: number
+          format: decimal
+          minimum: 0.1
+          maximum: 10000
+          example: 15
+          description: Garden height in feet
+        notes:
+          type: string
+          nullable: true
+          example: "South-facing garden with partial afternoon shade"
+        layout_preferences:
+          type: object
+          nullable: true
+          description: JSON object containing user's layout generation preferences
+          example: {"style": "rows", "spacing": "standard"}
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Plot:
+      type: object
+      required:
+        - id
+        - garden_id
+        - x
+        - y
+        - width
+        - height
+        - status
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        garden_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_profile_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        x:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 5.5
+          description: X coordinate in feet from garden origin
+        y:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 3.25
+          description: Y coordinate in feet from garden origin
+        width:
+          type: number
+          format: decimal
+          minimum: 0.1
+          maximum: 1000
+          example: 2
+          description: Plot width in feet
+        height:
+          type: number
+          format: decimal
+          minimum: 0.1
+          maximum: 1000
+          example: 2
+          description: Plot height in feet
+        notes:
+          type: string
+          nullable: true
+          example: "Planted 4 seedlings"
+        compass_direction:
+          type: string
+          nullable: true
+          enum: [N, NE, E, SE, S, SW, W, NW]
+          example: "S"
+        status:
+          type: string
+          enum: [planned, planted, harvested, archived]
+          default: planned
+          description: |
+            Lifecycle status:
+            - planned: Plot defined but not yet planted
+            - planted: Plants are in ground and growing
+            - harvested: Plants have been harvested
+            - archived: Plot is no longer active
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    CareHistory:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        action_type:
+          type: string
+          enum: [watered, fertilized, pruned, repotted, other]
+          example: "watered"
+        notes:
+          type: string
+          nullable: true
+          example: "Used organic fertilizer"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    JournalEntry:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        title:
+          type: string
+          maxLength: 200
+          example: "First Tomatoes!"
+        content:
+          type: string
+          example: "Harvested the first ripe tomatoes today. They taste amazing!"
+        photo_url:
+          type: string
+          format: uri
+          nullable: true
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Question:
+      type: object
+      required:
+        - id
+        - user_id
+        - title
+        - body
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: "Why are my tomato leaves turning yellow?"
+        body:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          example: "I've noticed yellow spots on the lower leaves of my tomato plants. What could be causing this?"
+        tags:
+          type: array
+          items:
+            type: string
+            maxLength: 50
+          maxItems: 10
+          example: ["tomatoes", "disease", "troubleshooting"]
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Answer:
+      type: object
+      required:
+        - id
+        - question_id
+        - user_id
+        - body
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        question_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        body:
+          type: string
+          minLength: 1
+          maxLength: 2000
+          example: "Yellow leaves could indicate nitrogen deficiency. Try adding compost or a balanced fertilizer."
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Vote:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        answer_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        vote_type:
+          type: string
+          enum: [up, down]
+          example: "up"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    Recommendation:
+      type: object
+      required:
+        - id
+        - user_id
+        - type
+        - message
+        - severity
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        type:
+          type: string
+          enum: [water, fertilize, prune, pest_check, harvest, general]
+          example: "water"
+        message:
+          type: string
+          example: "Your tomato plant needs watering soon"
+        severity:
+          type: string
+          enum: [low, medium, high]
+          default: medium
+          example: "high"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    PlantCompanion:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_profile_id_a:
+          $ref: './common.yaml#/components/schemas/UUID'
+        plant_profile_id_b:
+          $ref: './common.yaml#/components/schemas/UUID'
+        relationship:
+          type: string
+          enum: [good, bad, neutral]
+          example: "good"
+        reason:
+          type: string
+          nullable: true
+          example: "Tomatoes and basil are mutually beneficial companions"
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    AITask:
+      type: object
+      required:
+        - id
+        - task_type
+        - status
+        - request_payload
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        queue_job_id:
+          type: string
+          nullable: true
+          maxLength: 100
+          description: BullMQ job ID for tracking queue status
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        plant_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+          nullable: true
+        task_type:
+          type: string
+          enum:
+            - plant_update_suggestion
+            - weather_based_action
+            - care_recommendation
+            - pest_diagnosis
+            - general
+            - garden_analysis
+            - layout_generation
+          example: "garden_analysis"
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+          default: pending
+          example: "completed"
+        request_payload:
+          type: object
+          description: JSON object containing task-specific request data
+          example: {"garden_id": "123e4567-e89b-12d3-a456-426614174000"}
+        response_data:
+          type: object
+          nullable: true
+          description: JSON object containing AI response data
+        model_used:
+          type: string
+          nullable: true
+          maxLength: 100
+          example: "gpt-4"
+        error_message:
+          type: string
+          nullable: true
+          description: Error message if task failed
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+          description: When the task completed (successfully or with failure)
+
+    Notification:
+      type: object
+      required:
+        - id
+        - user_id
+        - message
+        - read
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        message:
+          type: string
+          minLength: 1
+          maxLength: 5000
+          example: "Your garden analysis is complete!"
+        link:
+          type: string
+          nullable: true
+          maxLength: 500
+          description: Optional link to related resource
+          example: "/gardens/123e4567-e89b-12d3-a456-426614174000/analysis"
+        type:
+          type: string
+          enum: [info, success, warning, error]
+          default: info
+          example: "success"
+        read:
+          type: boolean
+          default: false
+          example: false
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    GardenAnalysis:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        garden_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        analysis_data:
+          type: object
+          description: JSON object containing AI analysis results
+          example:
+            companionship_score: 85
+            suggestions: ["Consider adding basil near tomatoes"]
+            warnings: ["Onions and beans should not be planted together"]
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+
+    AnalysisUsage:
+      type: object
+      properties:
+        id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        user_id:
+          $ref: './common.yaml#/components/schemas/UUID'
+        date:
+          type: string
+          format: date
+          example: "2024-01-15"
+        count:
+          type: integer
+          minimum: 0
+          example: 3
+        bonus_count:
+          type: integer
+          minimum: 0
+          default: 0
+          description: Additional analyses granted by admin
+          example: 5
+        created_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'
+        updated_at:
+          $ref: './common.yaml#/components/schemas/Timestamp'

@@ -1,0 +1,235 @@
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Authentication
+      summary: Create a new user account
+      description: Register a new user with email and password. Returns JWT tokens for authentication.
+      operationId: signup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address (will be normalized)
+                  example: "gardener@example.com"
+                password:
+                  type: string
+                  minLength: 8
+                  description: Password (minimum 8 characters)
+                  example: "securePassword123"
+                timezone:
+                  type: string
+                  description: IANA timezone identifier (optional, defaults to UTC)
+                  example: "America/New_York"
+                  default: "UTC"
+      responses:
+        '201':
+          description: User created successfully
+          headers:
+            Set-Cookie:
+              description: HTTP-only cookies containing accessToken and refreshToken
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User created successfully"
+                  accessToken:
+                    type: string
+                    description: JWT access token (expires in 15 minutes)
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token (expires in 7 days)
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                      email:
+                        type: string
+                        format: email
+                      timezone:
+                        type: string
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '409':
+          $ref: '../schemas/common.yaml#/components/responses/Conflict'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Authenticate existing user
+      description: Login with email and password. Returns JWT tokens for authentication.
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address (will be normalized)
+                  example: "gardener@example.com"
+                password:
+                  type: string
+                  description: User's password
+                  example: "securePassword123"
+      responses:
+        '200':
+          description: Login successful
+          headers:
+            Set-Cookie:
+              description: HTTP-only cookies containing accessToken and refreshToken
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login successful"
+                  accessToken:
+                    type: string
+                    description: JWT access token (expires in 15 minutes)
+                  refreshToken:
+                    type: string
+                    description: JWT refresh token (expires in 7 days)
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                      email:
+                        type: string
+                        format: email
+                      timezone:
+                        type: string
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Invalid credentials"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: |
+        Exchange a valid refresh token for new access and refresh tokens.
+        Accepts refresh token from either HTTP-only cookie or request body.
+      operationId: refreshToken
+      requestBody:
+        required: false
+        description: Optional refresh token in body (will use cookie if not provided)
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token (optional if sent via cookie)
+      responses:
+        '200':
+          description: Tokens refreshed successfully
+          headers:
+            Set-Cookie:
+              description: HTTP-only cookies containing new accessToken and refreshToken
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    description: New JWT access token (expires in 15 minutes)
+                  refreshToken:
+                    type: string
+                    description: New JWT refresh token (expires in 7 days)
+        '401':
+          description: Invalid or missing refresh token
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              examples:
+                noToken:
+                  value:
+                    error: "No refresh token provided"
+                invalidToken:
+                  value:
+                    error: "Invalid refresh token"
+
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: |
+        Invalidate the user's refresh token and clear authentication cookies.
+        Accepts refresh token from either cookie or request body.
+      operationId: logout
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refreshToken:
+                  type: string
+                  description: Refresh token to invalidate (optional if sent via cookie)
+      responses:
+        '200':
+          description: Logged out successfully
+          headers:
+            Set-Cookie:
+              description: Cleared authentication cookies
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Logged out successfully"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

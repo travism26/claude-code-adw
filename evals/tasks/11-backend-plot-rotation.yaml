@@ -1,0 +1,28 @@
+id: 11-backend-plot-rotation
+target: backend
+plan_type: feature
+# Hard-mode: cross-module feature — migration + model + service + route +
+# tests, with project-convention landmines (migration naming/format,
+# route->service layering, validation patterns).
+prompt: >
+  Add seasonal rotation support to garden plots. Each plot gets an
+  optional rotation_season field with exactly four valid values —
+  spring, summer, fall, winter — where null means year-round.
+  Requirements: persist the field via a new sequelize migration that
+  follows the project's existing migration conventions; expose it when
+  gardens and plots are read; accept it on plot create and plot update,
+  rejecting invalid values with a 400; support filtering so that
+  GET /api/gardens/:id?season=<value> returns the garden with only the
+  plots matching that season plus year-round plots; keep the existing
+  route -> service layering (no model queries in route handlers). Add
+  mocha tests covering the persist round-trip, the 400 on an invalid
+  value, and the season filter including year-round inclusion.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "grep -rlq rotation_season src/migrations/"
+  - "basename \"$(grep -rl rotation_season src/migrations/ | head -1)\" | grep -qE '^[0-9]{5}-[a-z0-9-]+\\.js$'"
+  - "grep -q rotation_season src/models/Plot.ts"
+  - "grep -q rotation_season src/services/GardenService.ts"
+  - "grep -qi season src/tests/api/gardens.test.ts"
+  - "npx tsc --noEmit"
+judge_focus: "migration follows the 000XX-kebab-name.js convention, enum validated at the route boundary, filter semantics include year-round (null) plots, field flows through service layer rather than inline model queries"

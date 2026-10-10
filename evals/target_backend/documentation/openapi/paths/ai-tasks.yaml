@@ -1,0 +1,234 @@
+paths:
+  /ai-tasks:
+    post:
+      tags:
+        - AI Tasks
+      summary: Enqueue an AI task
+      description: |
+        Enqueue a new AI task for asynchronous processing.
+        Returns a job ID that can be used to check the status and retrieve results.
+        Tasks are processed by background workers using BullMQ.
+      operationId: enqueueAITask
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - type
+                - payload
+              properties:
+                type:
+                  type: string
+                  enum:
+                    - plant_update_suggestion
+                    - weather_based_action
+                    - care_recommendation
+                    - pest_diagnosis
+                    - general
+                  description: Type of AI task to perform
+                  example: "care_recommendation"
+                payload:
+                  type: object
+                  description: Task-specific data (structure varies by task type)
+                  example:
+                    plant_id: "123e4567-e89b-12d3-a456-426614174000"
+                    observation: "Leaves are yellowing"
+                userId:
+                  $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  description: User ID (optional, defaults to authenticated user)
+                plantId:
+                  $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  description: Plant ID (optional, for plant-specific tasks)
+                priority:
+                  type: integer
+                  minimum: 1
+                  maximum: 10
+                  description: Task priority (1=lowest, 10=highest)
+                  example: 5
+      responses:
+        '202':
+          description: AI task enqueued successfully (Accepted)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    description: Unique job identifier for tracking
+                    example: "1234567890"
+                  status:
+                    type: string
+                    description: Initial job status
+                    example: "waiting"
+                  type:
+                    type: string
+                    description: Task type
+                    example: "care_recommendation"
+                  message:
+                    type: string
+                    example: "AI task enqueued successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /ai-tasks/{jobId}:
+    get:
+      tags:
+        - AI Tasks
+      summary: Get AI task status
+      description: |
+        Get the complete status and details of a specific AI task job.
+        For layout_generation jobs, returns layout options when completed.
+        For other jobs, returns job result when completed.
+      operationId: getAITaskStatus
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: Job identifier returned when task was enqueued
+          schema:
+            type: string
+            example: "1234567890"
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - type: object
+                    description: Standard job status response
+                    properties:
+                      jobId:
+                        type: string
+                        example: "1234567890"
+                      type:
+                        type: string
+                        example: "care_recommendation"
+                      status:
+                        type: string
+                        enum: [waiting, active, completed, failed, delayed]
+                        example: "completed"
+                      result:
+                        type: object
+                        nullable: true
+                        description: Job result data (when completed)
+                      error:
+                        type: string
+                        nullable: true
+                        description: Error message (when failed)
+                      attemptsMade:
+                        type: integer
+                        description: Number of retry attempts made
+                        example: 1
+                      createdAt:
+                        type: integer
+                        description: Job creation timestamp (Unix milliseconds)
+                        example: 1704052800000
+                      finishedAt:
+                        type: integer
+                        nullable: true
+                        description: Job completion timestamp (Unix milliseconds)
+                        example: 1704052850000
+                  - type: object
+                    description: Layout generation job response
+                    properties:
+                      jobId:
+                        type: string
+                      status:
+                        type: string
+                        enum: [queued, processing, completed, failed]
+                      layouts:
+                        type: array
+                        nullable: true
+                        description: Generated layout options (when completed)
+                        items:
+                          type: object
+                      gardenId:
+                        $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                      message:
+                        type: string
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Job not found"
+                  jobId:
+                    type: string
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /ai-tasks/{jobId}/status:
+    get:
+      tags:
+        - AI Tasks
+      summary: Get lightweight job status
+      description: |
+        Get just the status of an AI task job without full details.
+        This is a lightweight endpoint for polling job status.
+      operationId: getAITaskStatusLightweight
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          description: Job identifier
+          schema:
+            type: string
+            example: "1234567890"
+      responses:
+        '200':
+          description: Job status retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  jobId:
+                    type: string
+                    example: "1234567890"
+                  status:
+                    type: string
+                    enum: [waiting, active, completed, failed, delayed]
+                    example: "completed"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Job not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Job not found"
+                  jobId:
+                    type: string
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

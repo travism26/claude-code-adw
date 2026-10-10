@@ -1,0 +1,20 @@
+id: 07-backend-companion-patch
+target: backend
+plan_type: feature
+prompt: >
+  Add a PATCH /api/companions/:id endpoint to the Express backend that
+  updates ONLY the `notes` field of an existing plant companion
+  relationship. The plant_a_id, plant_b_id, and relationship fields are
+  immutable — reject attempts to change them with a 400. Return 404 for a
+  non-existent relationship id and 401 for unauthenticated requests,
+  matching the auth pattern of the existing companion routes. Follow the
+  existing route -> service structure (src/routes/companions.ts and the
+  companion service). Add mocha tests in src/tests/api/companions.test.ts
+  covering: successful notes update, immutable-field rejection, 404, and
+  auth.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "grep -qE 'router\\.patch' src/routes/companions.ts"
+  - "grep -qiE 'patch' src/tests/api/companions.test.ts"
+  - "npx tsc --noEmit"
+judge_focus: "PATCH route following existing route/service conventions, immutability enforcement, auth + 404 handling, test coverage of all four cases"

@@ -1,0 +1,266 @@
+paths:
+  /plants:
+    get:
+      tags:
+        - Plants
+      summary: List user's plants
+      description: Retrieve all plants for the authenticated user, ordered by creation date (newest first)
+      operationId: listPlants
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: List of plants retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plants:
+                    type: array
+                    items:
+                      $ref: '../schemas/models.yaml#/components/schemas/Plant'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Plants
+      summary: Create a new plant
+      description: |
+        Create a new plant for the authenticated user.
+        If plant_profile_id is provided, care intervals are auto-populated from the profile (can be overridden).
+        If plant_profile_id is not provided, water_interval_days is required.
+      operationId: createPlant
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - type
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  description: Name for the plant
+                  example: "My Tomato Plant"
+                type:
+                  type: string
+                  enum: [indoor, outdoor]
+                  description: Whether the plant is indoor or outdoor
+                  example: "outdoor"
+                water_interval_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 365
+                  description: Days between waterings (required if no plant_profile_id)
+                  example: 3
+                fert_interval_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 365
+                  description: Days between fertilizing (optional)
+                  example: 14
+                species:
+                  type: string
+                  description: Plant species (optional)
+                  example: "Solanum lycopersicum"
+                photo_url:
+                  type: string
+                  format: uri
+                  description: URL to plant photo (optional)
+                  example: "https://example.com/photos/plant.jpg"
+                plant_profile_id:
+                  type: string
+                  format: uuid
+                  description: Link to plant profile for auto-populated defaults (optional)
+                  example: "123e4567-e89b-12d3-a456-426614174000"
+      responses:
+        '201':
+          description: Plant created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plant created successfully"
+                  plant:
+                    $ref: '../schemas/models.yaml#/components/schemas/Plant'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Plant profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Plant profile not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /plants/{id}:
+    get:
+      tags:
+        - Plants
+      summary: Get plant by ID
+      description: Retrieve a specific plant by ID. User must own the plant.
+      operationId: getPlant
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Plant ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Plant retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plant:
+                    $ref: '../schemas/models.yaml#/components/schemas/Plant'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Plants
+      summary: Update plant
+      description: Update any field of a plant. User must own the plant. All fields are optional.
+      operationId: updatePlant
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Plant ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  example: "Updated Plant Name"
+                type:
+                  type: string
+                  enum: [indoor, outdoor]
+                  example: "indoor"
+                water_interval_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 365
+                  example: 5
+                fert_interval_days:
+                  type: integer
+                  minimum: 1
+                  maximum: 365
+                  example: 21
+                species:
+                  type: string
+                  example: "Rosa chinensis"
+                photo_url:
+                  type: string
+                  format: uri
+                  example: "https://example.com/photos/updated.jpg"
+                plant_profile_id:
+                  type: string
+                  format: uuid
+                last_watered:
+                  type: string
+                  format: date-time
+                  example: "2024-01-15T10:30:00.000Z"
+                last_fertilized:
+                  type: string
+                  format: date-time
+                  example: "2024-01-10T09:00:00.000Z"
+      responses:
+        '200':
+          description: Plant updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plant updated successfully"
+                  plant:
+                    $ref: '../schemas/models.yaml#/components/schemas/Plant'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Plants
+      summary: Delete plant
+      description: Permanently delete a plant. User must own the plant. This action cannot be undone.
+      operationId: deletePlant
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Plant ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Plant deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plant deleted successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

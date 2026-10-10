@@ -1,0 +1,14 @@
+id: 03-bug-duplicate-id
+plan_type: bug
+prompt: >
+  Fix a bug in the notes app: after deleting a note, newly added notes can
+  receive an id that already belongs to another note. Reproduce: add two
+  notes, delete note 1, add a third note — the third note gets id 2, which
+  collides with the existing note. Ids must be unique for the lifetime of
+  the store (use max existing id + 1 or equivalent). Add a regression test
+  covering the delete-then-add sequence.
+test_command: "uv run pytest -q"
+acceptance:
+  - "rm -f /tmp/eval03.json && uv run python -m app.notes --db /tmp/eval03.json add 'A' >/dev/null && uv run python -m app.notes --db /tmp/eval03.json add 'B' >/dev/null && uv run python -m app.notes --db /tmp/eval03.json delete 1 >/dev/null && uv run python -m app.notes --db /tmp/eval03.json add 'C' >/dev/null && test \"$(uv run python -m app.notes --db /tmp/eval03.json list | grep -c '^\\[2\\]')\" = '1'"
+  - "grep -rq 'delete' tests/"
+judge_focus: "root-cause fix of id assignment (not a symptom patch) plus a regression test"

@@ -1,0 +1,113 @@
+[
+    {
+    "suggestions": [
+        {
+        "type": "optimization",
+        "category": "layout",
+        "title": "Optimize planting density and row spacing for arugula bed",
+        "description": "Your planned bed is 2ft x 17ft, which provides about 34 square feet of space. With a 6-inch spacing requirement, you can plant approximately 130–135 arugula plants per bed in staggered rows. This will maximize yield while maintaining airflow and reducing disease risk.",
+        "affectedIds": ["43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "medium",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "sunlight",
+        "title": "Ideal placement for partial sun conditions",
+        "description": "Arugula prefers partial sun, ideally 3–5 hours of direct sunlight daily. The southern orientation of your plot suggests strong light exposure—consider light shading (like shade cloth or partial coverage from taller plants) to prevent bolting during warmer months.",
+        "affectedIds": ["43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "high",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "seasonal_timing",
+        "title": "Plan early spring or fall planting for best growth",
+        "description": "Arugula thrives in cool temperatures. In Zone 5a, sow seeds in early spring (as soon as soil can be worked) or late summer for a fall harvest. For continuous yields, succession sow every 2 weeks until mid-summer, then resume in late August.",
+        "affectedIds": ["43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "high",
+        "actionable": true
+        },
+        {
+        "type": "improvement",
+        "category": "layout",
+        "title": "Add companion plants to improve biodiversity and pest control",
+        "description": "Since this bed currently only contains arugula, consider adding compatible companions like lettuce, spinach, or radishes in nearby plots to reduce pest pressure and improve soil diversity. Avoid close planting with heavy brassicas like cabbage or broccoli to prevent disease buildup.",
+        "affectedIds": ["43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "medium",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "zone_compatibility",
+        "title": "Excellent zone match",
+        "description": "Arugula is hardy across Zones 2–11, making it perfectly suited to your Zone 5a garden. You can expect strong germination and reliable growth in both spring and fall.",
+        "affectedIds": ["43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "low",
+        "actionable": false
+        }
+    ],
+    "overallScore": 88,
+    "summary": "Your garden layout is simple and well-suited for Zone 5a. The planned arugula bed has excellent climate compatibility and generous space. Focus on optimizing sunlight exposure, planning seasonal sowing for spring and fall, and considering companion plants to improve biodiversity and pest resistance."
+    },
+    {
+    "suggestions": [
+        {
+        "type": "warning",
+        "category": "companion_planting",
+        "title": "Avoid planting tomatoes near broccoli and arugula",
+        "description": "Tomatoes (Solanaceae) and members of the Brassicaceae family (like broccoli and arugula) are poor companions. They compete for nutrients, and brassicas can stunt tomato growth. If possible, place tomatoes at least 3–4 feet away or in a separate bed to prevent root competition and yield reduction.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "b8693fb8-3d0a-42ba-937e-fba8b29acb14", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "high",
+        "actionable": true
+        },
+        {
+        "type": "improvement",
+        "category": "layout",
+        "title": "Adjust plot positioning for optimal airflow and light exposure",
+        "description": "Since the garden is 17ft x 17ft, you have flexibility to spread out the 2ft-wide plots. Increase spacing between plots by at least 2ft to improve air circulation, reduce fungal risk, and ensure sunlight reaches lower leaves of broccoli and tomatoes.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "b8693fb8-3d0a-42ba-937e-fba8b29acb14", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "medium",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "sunlight",
+        "title": "Prioritize southern exposure for tomatoes",
+        "description": "Tomatoes require full sun (8+ hours daily). If your plot labeled 'S' receives the most southern exposure, move tomatoes there and place partial-sun crops like arugula in shadier areas or under taller plants. This ensures balanced light usage across crops.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "high",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "spacing",
+        "title": "Plan row spacing for efficient growth",
+        "description": "Each crop has different spacing needs: tomatoes (24in), broccoli (18in), and arugula (6in). In a 2ft-wide bed, use single rows for tomatoes and broccoli to allow proper root spread. Arugula can be sown in staggered rows for maximum density without overcrowding.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "b8693fb8-3d0a-42ba-937e-fba8b29acb14", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "medium",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "seasonal_timing",
+        "title": "Coordinate spring planting schedule",
+        "description": "Start tomatoes and broccoli indoors 6–8 weeks before your last frost (Zone 5a: around mid-March). Direct sow arugula outdoors as soon as the soil can be worked, usually early April. Stagger plantings for continuous harvests and efficient space use.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "b8693fb8-3d0a-42ba-937e-fba8b29acb14", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "high",
+        "actionable": true
+        },
+        {
+        "type": "optimization",
+        "category": "zone_compatibility",
+        "title": "All crops are well-suited to Zone 5a",
+        "description": "Tomatoes, broccoli, and arugula all perform reliably in Zone 5a with proper timing. Tomatoes may require protection from late frost if transplanted outdoors before late May.",
+        "affectedIds": ["117a24d1-5a5e-43c9-8224-ed5ff8c357c9", "b8693fb8-3d0a-42ba-937e-fba8b29acb14", "43527966-17ee-433c-80b9-3de5b5dfe2d2"],
+        "priority": "low",
+        "actionable": false
+        }
+    ],
+    "overallScore": 82,
+    "summary": "Your planned garden is well-suited for Zone 5a and features productive crops. The main issue is that tomatoes should be separated from broccoli and arugula to avoid growth inhibition. Adjust layout for better sunlight distribution and plan indoor starts in March for a strong spring planting."
+    }
+]

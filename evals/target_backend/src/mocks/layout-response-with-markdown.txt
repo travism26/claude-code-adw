@@ -1,0 +1,129 @@
+```json
+{
+  "layouts": [
+    {
+      "id": "layout_1",
+      "optimizationGoal": "max_yield",
+      "placements": [
+        {
+          "plantProfileId": "e4a6b1ea-5001-4ee7-90d0-605014be689c",
+          "plantName": "Cantaloupe",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 6.0,
+          "height": 3.0,
+          "quantity": 2,
+          "reasoning": "Cantaloupe requires significant space; placed on the north side to allow spread without shading. Intensive spacing allows for two plants."
+        },
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 7.0,
+          "y": 0.0,
+          "width": 4.0,
+          "height": 4.0,
+          "quantity": 1,
+          "reasoning": "Blueberry placed in northeast corner for maximum sun exposure."
+        },
+        {
+          "plantProfileId": "9b85c87a-68e5-4633-94b6-309b400ce599",
+          "plantName": "Broccoli",
+          "x": 0.0,
+          "y": 4.0,
+          "width": 3.0,
+          "height": 1.5,
+          "quantity": 4,
+          "reasoning": "Broccoli in row formation for efficient harvesting."
+        },
+        {
+          "plantProfileId": "4e5d45e7-70e2-4360-bd15-7222ca8419dd",
+          "plantName": "Bell Pepper",
+          "x": 4.0,
+          "y": 4.0,
+          "width": 3.0,
+          "height": 1.5,
+          "quantity": 4,
+          "reasoning": "Bell peppers placed near broccoli."
+        },
+        {
+          "plantProfileId": "ea685525-5e2d-4c35-aa22-16a1a751c01d",
+          "plantName": "Basil",
+          "x": 8.0,
+          "y": 4.0,
+          "width": 2.0,
+          "height": 1.0,
+          "quantity": 4,
+          "reasoning": "Basil companion planted with peppers."
+        }
+      ],
+      "score": 88,
+      "companionScore": 85,
+      "spacingScore": 90,
+      "accessibilityScore": 89,
+      "warnings": []
+    },
+    {
+      "id": "layout_2",
+      "optimizationGoal": "max_variety",
+      "placements": [
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 4.0,
+          "height": 4.0,
+          "quantity": 1,
+          "reasoning": "Single blueberry as anchor plant."
+        },
+        {
+          "plantProfileId": "e4a6b1ea-5001-4ee7-90d0-605014be689c",
+          "plantName": "Cantaloupe",
+          "x": 5.0,
+          "y": 0.0,
+          "width": 5.0,
+          "height": 3.0,
+          "quantity": 1,
+          "reasoning": "One cantaloupe plant with sprawl room."
+        }
+      ],
+      "score": 85,
+      "companionScore": 88,
+      "spacingScore": 82,
+      "accessibilityScore": 85,
+      "warnings": []
+    },
+    {
+      "id": "layout_3",
+      "optimizationGoal": "beginner_friendly",
+      "placements": [
+        {
+          "plantProfileId": "ae513a60-aaff-4194-b4a1-4d4928c5d5c6",
+          "plantName": "Blueberry",
+          "x": 0.0,
+          "y": 0.0,
+          "width": 5.0,
+          "height": 5.0,
+          "quantity": 1,
+          "reasoning": "Extra space for beginner-friendly maintenance."
+        },
+        {
+          "plantProfileId": "ea685525-5e2d-4c35-aa22-16a1a751c01d",
+          "plantName": "Basil",
+          "x": 6.0,
+          "y": 0.0,
+          "width": 2.0,
+          "height": 2.0,
+          "quantity": 3,
+          "reasoning": "Easy basil with plenty of space."
+        }
+      ],
+      "score": 82,
+      "companionScore": 80,
+      "spacingScore": 95,
+      "accessibilityScore": 90,
+      "warnings": []
+    }
+  ]
+}
+```

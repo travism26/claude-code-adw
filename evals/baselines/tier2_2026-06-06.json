@@ -1,0 +1,168 @@
+{
+  "variant": "backend-baseline",
+  "created": "2026-06-06T22:09:15+00:00",
+  "tasks": [
+    "07-backend-companion-patch",
+    "08-backend-seasonal-tips-crud",
+    "09-backend-photo-timeline"
+  ],
+  "cells": {
+    "07-backend-companion-patch/tests_pass": {
+      "mean": 1.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "07-backend-companion-patch/acceptance_checks": {
+      "mean": 1.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "07-backend-companion-patch/phases_completed": {
+      "mean": 5.666666666666667,
+      "spread": 0.5773502691896257,
+      "n": 3
+    },
+    "07-backend-companion-patch/test_retries_used": {
+      "mean": 0.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "07-backend-companion-patch/total_cost_usd": {
+      "mean": 1.8284155666666668,
+      "spread": 0.06600990675406872,
+      "n": 3
+    },
+    "07-backend-companion-patch/wall_minutes": {
+      "mean": 10.70402001181113,
+      "spread": 2.3435524921699455,
+      "n": 3
+    },
+    "07-backend-companion-patch/diff_size": {
+      "mean": 146.0,
+      "spread": 35.552777669262355,
+      "n": 3
+    },
+    "07-backend-companion-patch/spec_word_count": {
+      "mean": 2113.0,
+      "spread": 125.40733630852702,
+      "n": 3
+    },
+    "07-backend-companion-patch/spec_quality": {
+      "mean": 5.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "07-backend-companion-patch/implementation_fidelity": {
+      "mean": 4.666666666666667,
+      "spread": 0.5773502691896257,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/tests_pass": {
+      "mean": 0.9915611814345991,
+      "spread": 0.01461646251112978,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/acceptance_checks": {
+      "mean": 0.9333333333333332,
+      "spread": 0.11547005383792512,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/phases_completed": {
+      "mean": 4.666666666666667,
+      "spread": 2.309401076758503,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/test_retries_used": {
+      "mean": 0.0,
+      "spread": 0.0,
+      "n": 2
+    },
+    "08-backend-seasonal-tips-crud/total_cost_usd": {
+      "mean": 2.0034925,
+      "spread": 0.2411477627713144,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/wall_minutes": {
+      "mean": 19.013312874994558,
+      "spread": 0.523697745342346,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/diff_size": {
+      "mean": 324.6666666666667,
+      "spread": 145.51403139674653,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/spec_word_count": {
+      "mean": 2278.6666666666665,
+      "spread": 83.24261729026385,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/spec_quality": {
+      "mean": 5.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "08-backend-seasonal-tips-crud/implementation_fidelity": {
+      "mean": 4.666666666666667,
+      "spread": 0.5773502691896257,
+      "n": 3
+    },
+    "09-backend-photo-timeline/tests_pass": {
+      "mean": 0.9991928974979821,
+      "spread": 0.0013979425404107308,
+      "n": 3
+    },
+    "09-backend-photo-timeline/acceptance_checks": {
+      "mean": 1.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "09-backend-photo-timeline/phases_completed": {
+      "mean": 6.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "09-backend-photo-timeline/test_retries_used": {
+      "mean": 0.6666666666666666,
+      "spread": 0.5773502691896257,
+      "n": 3
+    },
+    "09-backend-photo-timeline/total_cost_usd": {
+      "mean": 5.68812955,
+      "spread": 2.4165622839496432,
+      "n": 3
+    },
+    "09-backend-photo-timeline/wall_minutes": {
+      "mean": 34.67082656897772,
+      "spread": 11.802859773159303,
+      "n": 3
+    },
+    "09-backend-photo-timeline/diff_size": {
+      "mean": 489.6666666666667,
+      "spread": 88.11545456577599,
+      "n": 3
+    },
+    "09-backend-photo-timeline/spec_word_count": {
+      "mean": 2689.0,
+      "spread": 34.044089061098404,
+      "n": 3
+    },
+    "09-backend-photo-timeline/spec_quality": {
+      "mean": 5.0,
+      "spread": 0.0,
+      "n": 3
+    },
+    "09-backend-photo-timeline/implementation_fidelity": {
+      "mean": 5.0,
+      "spread": 0.0,
+      "n": 3
+    }
+  },
+  "summary": {
+    "trials": 9,
+    "ok": 8,
+    "task_fail": 1,
+    "infra_error": 0,
+    "judge_cost_usd": 0.6873966
+  }
+}

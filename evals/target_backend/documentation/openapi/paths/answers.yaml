@@ -1,0 +1,276 @@
+paths:
+  /answers:
+    post:
+      tags:
+        - Answers
+      summary: Create an answer
+      description: Create a new answer to a question. User must be authenticated.
+      operationId: createAnswer
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question_id
+                - body
+              properties:
+                question_id:
+                  $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  description: ID of the question being answered
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                  description: Answer text
+                  example: "Yellow leaves could indicate nitrogen deficiency. Try adding compost or a balanced fertilizer."
+      responses:
+        '201':
+          description: Answer created successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../schemas/models.yaml#/components/schemas/Answer'
+                  - type: object
+                    properties:
+                      author:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                          email:
+                            type: string
+                            format: email
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Question not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Question not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /answers/{id}:
+    put:
+      tags:
+        - Answers
+      summary: Update answer
+      description: Update an answer. User must be the author.
+      operationId: updateAnswer
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Answer ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - body
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 2000
+                  example: "Updated answer with more detailed information"
+      responses:
+        '200':
+          description: Answer updated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../schemas/models.yaml#/components/schemas/Answer'
+                  - type: object
+                    properties:
+                      author:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                          email:
+                            type: string
+                            format: email
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Answers
+      summary: Delete answer
+      description: Delete an answer. User must be the author. This action cannot be undone.
+      operationId: deleteAnswer
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Answer ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Answer deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Answer deleted successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          $ref: '../schemas/common.yaml#/components/responses/Forbidden'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /answers/{id}/vote:
+    post:
+      tags:
+        - Answers
+      summary: Vote on answer
+      description: |
+        Vote on an answer with an upvote (1) or downvote (-1).
+        If user has already voted, the vote value will be updated.
+        The answer's upvote count is automatically adjusted.
+      operationId: voteOnAnswer
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Answer ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - value
+              properties:
+                value:
+                  type: integer
+                  enum: [1, -1]
+                  description: Vote value (1 for upvote, -1 for downvote)
+                  example: 1
+      responses:
+        '200':
+          description: Vote recorded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../schemas/models.yaml#/components/schemas/Answer'
+                  - type: object
+                    properties:
+                      author:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                          email:
+                            type: string
+                            format: email
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Answer not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Answer not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Answers
+      summary: Remove vote from answer
+      description: Remove user's vote from an answer. The answer's upvote count is automatically adjusted.
+      operationId: removeVote
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Answer ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Vote removed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../schemas/models.yaml#/components/schemas/Answer'
+                  - type: object
+                    properties:
+                      author:
+                        type: object
+                        properties:
+                          id:
+                            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                          email:
+                            type: string
+                            format: email
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Answer or vote not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Vote not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

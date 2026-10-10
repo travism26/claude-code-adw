@@ -1,0 +1,61 @@
+id: MR02-grow-phase-age
+# Realistic two-real-repo multi-repo eval: the vendored growbuddy Next.js
+# frontend + Express/TS backend. One cross-cutting ticket is handed
+# INDEPENDENTLY to each repo (same prompt, separate per-repo SDLC, separate
+# worktree, no shared spec) — each repo builds and is graded on its own slice.
+#
+# Verified net-new (absent in both repos at vendor time): a "days in current
+# phase" stat derived from a grow's phase_started_at. No DB migration needed.
+#
+# Backend slice  -> tsc + the agent's mocha test in the full parallel suite,
+#                   plus structural acceptance greps (mirrors tasks 07-13).
+# Frontend slice -> `next build` (compile/typecheck gate) + a HELD-OUT Playwright
+#                   oracle (evals/oracles/frontend/grow_phase_age.spec.ts) run
+#                   against `next start`, backend API stubbed (decoupled — no live
+#                   backend, no DB). The agent never sees the oracle; the contract
+#                   it builds to (data-testid, "Day N" text) lives in this ticket.
+ticket: >
+  Surface how long a grow has been in its current growth phase ("days in
+  phase"), computed as the whole number of days between the grow's
+  phase_started_at timestamp and now (fall back to started_at when
+  phase_started_at is null).
+
+  If this is the Express/TypeScript BACKEND repo: include an integer
+  `days_in_phase` field in the GET /api/grows/:id response (and wherever a
+  single grow is serialized), computed from phase_started_at. Do not add a
+  database column — derive it. Keep every existing endpoint and field working.
+  Add mocha coverage in src/tests/api/grows.test.ts asserting days_in_phase is
+  present and correct for a grow with a known phase_started_at.
+
+  If this is the Next.js FRONTEND repo: on the grow detail page
+  (app/grows/[id]), render a small badge showing the current phase age as the
+  text "Day N" (e.g. "Day 12"), where N is the days-in-phase computed from the
+  grow's phase_started_at. The badge element MUST have
+  data-testid="grow-phase-age". Keep the rest of the page working.
+
+repos:
+  - name: backend
+    target: backend
+    plan_type: feature
+    test_command: "npx tsc --noEmit && npm run test:api:parallel"
+    # NOTE: camelCase `daysInPhase` already exists on baseline, but only inside
+    # the AI context builder (src/services/ai/grow/), never in the API response.
+    # The net-new artifact is the snake_case `days_in_phase` API field (the
+    # backend's serialization convention), so acceptance greps snake_case only —
+    # camelCase would pass trivially on baseline (a saturation trap).
+    acceptance:
+      - "grep -rq 'days_in_phase' src/routes src/services src/models"
+      - "grep -q 'days_in_phase' src/tests/api/grows.test.ts"
+      - "npx tsc --noEmit"
+
+  - name: frontend
+    target: frontend
+    plan_type: feature
+    # test_command is unused for frontend repos — grade_frontend runs
+    # `next build` + the held-out Playwright oracle instead.
+    oracle_spec: grow_phase_age.spec.ts
+    acceptance:
+      - "grep -rqE \"grow-phase-age\" app components"
+      - "grep -rqE \"phase_started_at\" app components"
+
+judge_focus: "a derived days-in-phase stat wired cleanly into each repo's existing layer (backend: computed in the grow serialization + GET response with a test; frontend: a Day N badge on the grow detail page from phase_started_at), without breaking existing behavior or adding a DB column"

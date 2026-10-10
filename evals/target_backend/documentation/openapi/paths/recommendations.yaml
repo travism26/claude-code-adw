@@ -1,0 +1,237 @@
+paths:
+  /recommendations:
+    get:
+      tags:
+        - Recommendations
+      summary: Get user recommendations
+      description: |
+        Retrieve personalized care recommendations for the authenticated user.
+        Recommendations are sorted by severity (high first) and creation date (newest first).
+        Supports filtering by severity level and recommendation type.
+      operationId: listRecommendations
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of recommendations to return
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: severity
+          in: query
+          description: Filter by severity level
+          schema:
+            type: string
+            enum: [low, medium, high]
+            example: "high"
+        - name: type
+          in: query
+          description: Filter by recommendation type
+          schema:
+            type: string
+            enum: [water, fertilize, prune, pest_check, harvest, general]
+            example: "water"
+      responses:
+        '200':
+          description: Recommendations retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '../schemas/models.yaml#/components/schemas/Recommendation'
+                    - type: object
+                      properties:
+                        plant:
+                          type: object
+                          nullable: true
+                          properties:
+                            id:
+                              $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                            name:
+                              type: string
+                            type:
+                              type: string
+                              enum: [indoor, outdoor]
+                            plantProfile:
+                              type: object
+                              nullable: true
+                              properties:
+                                common_name:
+                                  type: string
+                                species:
+                                  type: string
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /recommendations/summary:
+    get:
+      tags:
+        - Recommendations
+      summary: Get recommendation summary
+      description: Get counts of recommendations grouped by severity and type for the authenticated user.
+      operationId: getRecommendationSummary
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Summary retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of recommendations
+                    example: 15
+                  by_severity:
+                    type: object
+                    properties:
+                      high:
+                        type: integer
+                        example: 3
+                      medium:
+                        type: integer
+                        example: 7
+                      low:
+                        type: integer
+                        example: 5
+                  by_type:
+                    type: object
+                    properties:
+                      water:
+                        type: integer
+                        example: 5
+                      fertilize:
+                        type: integer
+                        example: 3
+                      prune:
+                        type: integer
+                        example: 2
+                      pest_check:
+                        type: integer
+                        example: 1
+                      harvest:
+                        type: integer
+                        example: 2
+                      general:
+                        type: integer
+                        example: 2
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /recommendations/generate:
+    post:
+      tags:
+        - Recommendations
+      summary: Generate recommendations
+      description: |
+        Manually trigger recommendation generation for the authenticated user.
+        Deletes existing recommendations and generates new ones based on current plant care needs.
+      operationId: generateRecommendations
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Recommendations generated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Recommendations generated successfully"
+                  count:
+                    type: integer
+                    description: Number of recommendations generated
+                    example: 8
+                  recommendations:
+                    type: array
+                    items:
+                      $ref: '../schemas/models.yaml#/components/schemas/Recommendation'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /recommendations/generate-all:
+    post:
+      tags:
+        - Recommendations
+      summary: Generate recommendations for all users
+      description: |
+        Manually trigger recommendation generation for all users in the system.
+        This is an admin/testing endpoint. In production, should be restricted to admin users.
+      operationId: generateAllRecommendations
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Recommendations generated for all users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Recommendations generated for all users"
+                  totalRecommendations:
+                    type: integer
+                    description: Total number of recommendations generated across all users
+                    example: 127
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /recommendations/{id}:
+    delete:
+      tags:
+        - Recommendations
+      summary: Dismiss recommendation
+      description: Delete (dismiss) a recommendation. User must own the recommendation.
+      operationId: deleteRecommendation
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Recommendation ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Recommendation dismissed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Recommendation dismissed successfully"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

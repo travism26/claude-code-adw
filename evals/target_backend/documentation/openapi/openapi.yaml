@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: GrowBuddy v2 API
+  description: |
+    Comprehensive API for GrowBuddy v2 - a plant care and garden planning application.
+
+    ## Authentication
+    Most endpoints require JWT authentication via:
+    - `Authorization: Bearer <token>` header, or
+    - `accessToken` HTTP-only cookie
+
+    Obtain tokens via `/api/auth/signup` or `/api/auth/login` endpoints.
+
+    ## Features
+    - **Plant Management**: Track indoor/outdoor plants with care schedules
+    - **Plant Database**: Browse 100+ plant profiles with growing information
+    - **Garden Planner**: Design garden layouts with plot management
+    - **AI Analysis**: Get AI-powered companion planting recommendations
+    - **Layout Generation**: Generate optimized garden layouts automatically
+    - **Community Q&A**: Ask and answer gardening questions
+    - **Care Tracking**: Log watering, fertilizing, and other care actions
+    - **Journal**: Document plant growth and observations
+    - **Recommendations**: Receive personalized plant care suggestions
+    - **Notifications**: Real-time updates via WebSocket
+
+    ## Rate Limits
+    - AI garden analysis: Limited to 3 per day per user (configurable)
+    - Additional analyses can be granted by administrators
+
+    ## WebSocket Support
+    Real-time notifications delivered via WebSocket at `/ws`
+
+  version: 2.0.0
+  contact:
+    name: GrowBuddy Support
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://api.example.com/api
+    description: Production server (placeholder)
+
+tags:
+  - name: Authentication
+    description: User authentication and session management
+  - name: Plants
+    description: User's plant collection management
+  - name: Plant Profiles
+    description: Browse plant database with care information
+  - name: Zones
+    description: Growing zone detection and management
+  - name: Care History
+    description: Track plant care actions (watering, fertilizing, etc.)
+  - name: Journal
+    description: Plant growth journal and observations
+  - name: Questions
+    description: Community Q&A for gardening questions
+  - name: Answers
+    description: Answer community questions and vote
+  - name: Gardens
+    description: Garden planning with plots and AI analysis
+  - name: Recommendations
+    description: Personalized plant care recommendations
+  - name: Companions
+    description: Companion planting relationships
+  - name: AI Tasks
+    description: Asynchronous AI task queue management
+  - name: Notifications
+    description: User notifications and alerts
+  - name: Admin
+    description: Administrative endpoints for user management
+  - name: Analysis Usage
+    description: Track AI analysis usage limits
+
+paths:
+  # Authentication
+  /auth/signup:
+    $ref: './paths/auth.yaml#/paths/~1auth~1signup'
+  /auth/login:
+    $ref: './paths/auth.yaml#/paths/~1auth~1login'
+  /auth/refresh:
+    $ref: './paths/auth.yaml#/paths/~1auth~1refresh'
+  /auth/logout:
+    $ref: './paths/auth.yaml#/paths/~1auth~1logout'
+
+  # Plants
+  /plants:
+    $ref: './paths/plants.yaml#/paths/~1plants'
+  /plants/{id}:
+    $ref: './paths/plants.yaml#/paths/~1plants~1{id}'
+
+  # Plant Profiles
+  /plant-profiles:
+    $ref: './paths/plant-profiles.yaml#/paths/~1plant-profiles'
+  /plant-profiles/search:
+    $ref: './paths/plant-profiles.yaml#/paths/~1plant-profiles~1search'
+  /plant-profiles/{id}:
+    $ref: './paths/plant-profiles.yaml#/paths/~1plant-profiles~1{id}'
+
+  # Zones
+  /zones/detect:
+    $ref: './paths/zones.yaml#/paths/~1zones~1detect'
+  /zones/user:
+    $ref: './paths/zones.yaml#/paths/~1zones~1user'
+
+  # Care History
+  /care-history:
+    $ref: './paths/care-history.yaml#/paths/~1care-history'
+  /care-history/plant/{plantId}:
+    $ref: './paths/care-history.yaml#/paths/~1care-history~1plant~1{plantId}'
+  /care-history/{id}:
+    $ref: './paths/care-history.yaml#/paths/~1care-history~1{id}'
+
+  # Journal
+  /journal:
+    $ref: './paths/journal.yaml#/paths/~1journal'
+  /journal/plant/{plantId}:
+    $ref: './paths/journal.yaml#/paths/~1journal~1plant~1{plantId}'
+  /journal/{id}:
+    $ref: './paths/journal.yaml#/paths/~1journal~1{id}'
+
+  # Questions
+  /questions:
+    $ref: './paths/questions.yaml#/paths/~1questions'
+  /questions/{id}:
+    $ref: './paths/questions.yaml#/paths/~1questions~1{id}'
+
+  # Answers
+  /answers:
+    $ref: './paths/answers.yaml#/paths/~1answers'
+  /answers/{id}:
+    $ref: './paths/answers.yaml#/paths/~1answers~1{id}'
+  /answers/{id}/vote:
+    $ref: './paths/answers.yaml#/paths/~1answers~1{id}~1vote'
+
+  # Gardens
+  /gardens:
+    $ref: './paths/gardens.yaml#/paths/~1gardens'
+  /gardens/{id}:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}'
+  /gardens/{id}/plots:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1plots'
+  /gardens/{id}/plots/{plotId}:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1plots~1{plotId}'
+  /gardens/{id}/analyze:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1analyze'
+  /gardens/{id}/analysis:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1analysis'
+  /gardens/{id}/generate-layout:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1generate-layout'
+  /gardens/{id}/apply-layout:
+    $ref: './paths/gardens.yaml#/paths/~1gardens~1{id}~1apply-layout'
+
+  # Recommendations
+  /recommendations:
+    $ref: './paths/recommendations.yaml#/paths/~1recommendations'
+  /recommendations/summary:
+    $ref: './paths/recommendations.yaml#/paths/~1recommendations~1summary'
+  /recommendations/generate:
+    $ref: './paths/recommendations.yaml#/paths/~1recommendations~1generate'
+  /recommendations/generate-all:
+    $ref: './paths/recommendations.yaml#/paths/~1recommendations~1generate-all'
+  /recommendations/{id}:
+    $ref: './paths/recommendations.yaml#/paths/~1recommendations~1{id}'
+
+  # Companions
+  /companions:
+    $ref: './paths/companions.yaml#/paths/~1companions'
+  /companions/{plantProfileId}:
+    $ref: './paths/companions.yaml#/paths/~1companions~1{plantProfileId}'
+  /companions/{id}:
+    $ref: './paths/companions.yaml#/paths/~1companions~1{id}'
+
+  # AI Tasks
+  /ai-tasks:
+    $ref: './paths/ai-tasks.yaml#/paths/~1ai-tasks'
+  /ai-tasks/{jobId}:
+    $ref: './paths/ai-tasks.yaml#/paths/~1ai-tasks~1{jobId}'
+  /ai-tasks/{jobId}/status:
+    $ref: './paths/ai-tasks.yaml#/paths/~1ai-tasks~1{jobId}~1status'
+
+  # Notifications
+  /notifications:
+    $ref: './paths/notifications.yaml#/paths/~1notifications'
+  /notifications/unread-count:
+    $ref: './paths/notifications.yaml#/paths/~1notifications~1unread-count'
+  /notifications/{id}:
+    $ref: './paths/notifications.yaml#/paths/~1notifications~1{id}'
+  /notifications/{id}/read:
+    $ref: './paths/notifications.yaml#/paths/~1notifications~1{id}~1read'
+  /notifications/mark-all-read:
+    $ref: './paths/notifications.yaml#/paths/~1notifications~1mark-all-read'
+  /notifications/test:
+    $ref: './paths/notifications.yaml#/paths/~1notifications~1test'
+
+  # Admin
+  /admin/users:
+    $ref: './paths/admin.yaml#/paths/~1admin~1users'
+  /admin/users/{id}:
+    $ref: './paths/admin.yaml#/paths/~1admin~1users~1{id}'
+  /admin/users/{id}/grant-analyses:
+    $ref: './paths/admin.yaml#/paths/~1admin~1users~1{id}~1grant-analyses'
+  /admin/stats:
+    $ref: './paths/admin.yaml#/paths/~1admin~1stats'
+  /admin/notifications/send-to-user:
+    $ref: './paths/admin.yaml#/paths/~1admin~1notifications~1send-to-user'
+  /admin/notifications/send-to-all:
+    $ref: './paths/admin.yaml#/paths/~1admin~1notifications~1send-to-all'
+
+  # Analysis Usage
+  /analysis-usage/today:
+    $ref: './paths/analysis-usage.yaml#/paths/~1analysis-usage~1today'
+  /analysis-usage/can-analyze:
+    $ref: './paths/analysis-usage.yaml#/paths/~1analysis-usage~1can-analyze'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      $ref: './schemas/common.yaml#/components/securitySchemes/BearerAuth'
+    CookieAuth:
+      $ref: './schemas/common.yaml#/components/securitySchemes/CookieAuth'
+
+  schemas:
+    # Common Schemas
+    Error:
+      $ref: './schemas/common.yaml#/components/schemas/Error'
+    ValidationError:
+      $ref: './schemas/common.yaml#/components/schemas/ValidationError'
+    SuccessMessage:
+      $ref: './schemas/common.yaml#/components/schemas/SuccessMessage'
+    Pagination:
+      $ref: './schemas/common.yaml#/components/schemas/Pagination'
+    UUID:
+      $ref: './schemas/common.yaml#/components/schemas/UUID'
+    Timestamp:
+      $ref: './schemas/common.yaml#/components/schemas/Timestamp'
+
+    # Model Schemas
+    User:
+      $ref: './schemas/models.yaml#/components/schemas/User'
+    Plant:
+      $ref: './schemas/models.yaml#/components/schemas/Plant'
+    PlantProfile:
+      $ref: './schemas/models.yaml#/components/schemas/PlantProfile'
+    SeasonalTip:
+      $ref: './schemas/models.yaml#/components/schemas/SeasonalTip'
+    Garden:
+      $ref: './schemas/models.yaml#/components/schemas/Garden'
+    Plot:
+      $ref: './schemas/models.yaml#/components/schemas/Plot'
+    CareHistory:
+      $ref: './schemas/models.yaml#/components/schemas/CareHistory'
+    JournalEntry:
+      $ref: './schemas/models.yaml#/components/schemas/JournalEntry'
+    Question:
+      $ref: './schemas/models.yaml#/components/schemas/Question'
+    Answer:
+      $ref: './schemas/models.yaml#/components/schemas/Answer'
+    Vote:
+      $ref: './schemas/models.yaml#/components/schemas/Vote'
+    Recommendation:
+      $ref: './schemas/models.yaml#/components/schemas/Recommendation'
+    PlantCompanion:
+      $ref: './schemas/models.yaml#/components/schemas/PlantCompanion'
+    AITask:
+      $ref: './schemas/models.yaml#/components/schemas/AITask'
+    Notification:
+      $ref: './schemas/models.yaml#/components/schemas/Notification'
+    GardenAnalysis:
+      $ref: './schemas/models.yaml#/components/schemas/GardenAnalysis'
+    AnalysisUsage:
+      $ref: './schemas/models.yaml#/components/schemas/AnalysisUsage'
+
+  responses:
+    BadRequest:
+      $ref: './schemas/common.yaml#/components/responses/BadRequest'
+    Unauthorized:
+      $ref: './schemas/common.yaml#/components/responses/Unauthorized'
+    Forbidden:
+      $ref: './schemas/common.yaml#/components/responses/Forbidden'
+    NotFound:
+      $ref: './schemas/common.yaml#/components/responses/NotFound'
+    Conflict:
+      $ref: './schemas/common.yaml#/components/responses/Conflict'
+    TooManyRequests:
+      $ref: './schemas/common.yaml#/components/responses/TooManyRequests'
+    InternalServerError:
+      $ref: './schemas/common.yaml#/components/responses/InternalServerError'
+
+  parameters:
+    LimitParam:
+      $ref: './schemas/common.yaml#/components/parameters/LimitParam'
+    PageParam:
+      $ref: './schemas/common.yaml#/components/parameters/PageParam'
+    SortParam:
+      $ref: './schemas/common.yaml#/components/parameters/SortParam'
+    OrderParam:
+      $ref: './schemas/common.yaml#/components/parameters/OrderParam'

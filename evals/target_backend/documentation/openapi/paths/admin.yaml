@@ -1,0 +1,442 @@
+paths:
+  /admin/users:
+    get:
+      tags:
+        - Admin
+      summary: List all users
+      description: |
+        Fetch all users with pagination support.
+        Supports searching by email. Intended for admin use.
+      operationId: listUsers
+      parameters:
+        - $ref: '../schemas/common.yaml#/components/parameters/PageParam'
+        - $ref: '../schemas/common.yaml#/components/parameters/LimitParam'
+        - name: search
+          in: query
+          description: Search by email (case-insensitive partial match)
+          schema:
+            type: string
+            maxLength: 100
+            example: "gardener@example.com"
+      responses:
+        '200':
+          description: Users retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                        email:
+                          type: string
+                          format: email
+                        growing_zone:
+                          type: string
+                          nullable: true
+                        postal_code:
+                          type: string
+                          nullable: true
+                        tz:
+                          type: string
+                          nullable: true
+                        created_at:
+                          $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+                        updated_at:
+                          $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+                  pagination:
+                    $ref: '../schemas/common.yaml#/components/schemas/Pagination'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /admin/users/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get user by ID
+      description: Fetch a single user's details by ID. Intended for admin use.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                      email:
+                        type: string
+                        format: email
+                      growing_zone:
+                        type: string
+                        nullable: true
+                      postal_code:
+                        type: string
+                        nullable: true
+                      tz:
+                        type: string
+                        nullable: true
+                      zone_override:
+                        type: boolean
+                      created_at:
+                        $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+                      updated_at:
+                        $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Admin
+      summary: Update user
+      description: Update user information. All fields are optional. Intended for admin use.
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: "newemail@example.com"
+                growing_zone:
+                  type: string
+                  pattern: '^([1-9]|1[0-3])[ab]?$'
+                  example: "7a"
+                postal_code:
+                  type: string
+                  maxLength: 20
+                  example: "12345"
+                tz:
+                  type: string
+                  description: IANA timezone identifier
+                  example: "America/New_York"
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User updated successfully"
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                      email:
+                        type: string
+                        format: email
+                      growing_zone:
+                        type: string
+                        nullable: true
+                      postal_code:
+                        type: string
+                        nullable: true
+                      tz:
+                        type: string
+                        nullable: true
+                      zone_override:
+                        type: boolean
+                      created_at:
+                        $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+                      updated_at:
+                        $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '409':
+          description: Email already exists
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Email already exists"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /admin/users/{id}/grant-analyses:
+    post:
+      tags:
+        - Admin
+      summary: Grant bonus analyses to user
+      description: Grant bonus AI analyses to a specific user for today. Intended for admin use.
+      operationId: grantBonusAnalyses
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: User ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - count
+              properties:
+                count:
+                  type: integer
+                  minimum: 1
+                  description: Number of bonus analyses to grant
+                  example: 5
+      responses:
+        '200':
+          description: Bonus analyses granted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Successfully granted 5 bonus analyses to user"
+                  userId:
+                    $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  usageRecord:
+                    type: object
+                    properties:
+                      analysesUsed:
+                        type: integer
+                        example: 2
+                      bonusAnalyses:
+                        type: integer
+                        example: 5
+                      usageDate:
+                        type: string
+                        format: date
+                        example: "2024-01-15"
+                  stats:
+                    type: object
+                    description: Updated usage statistics
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /admin/stats:
+    get:
+      tags:
+        - Admin
+      summary: Get user statistics
+      description: |
+        Get aggregate statistics about users in the system.
+        Includes total users, users by zone, recent signups, and more.
+      operationId: getUserStats
+      responses:
+        '200':
+          description: Statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                    description: Total number of users
+                    example: 1247
+                  usersByZone:
+                    type: array
+                    description: User count grouped by growing zone
+                    items:
+                      type: object
+                      properties:
+                        zone:
+                          type: string
+                          example: "7a"
+                        count:
+                          type: integer
+                          example: 143
+                  recentSignups:
+                    type: object
+                    properties:
+                      last7Days:
+                        type: integer
+                        description: Users created in last 7 days
+                        example: 12
+                      last30Days:
+                        type: integer
+                        description: Users created in last 30 days
+                        example: 47
+                  usersWithoutZone:
+                    type: integer
+                    description: Number of users without a growing zone set
+                    example: 23
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /admin/notifications/send-to-user:
+    post:
+      tags:
+        - Admin
+      summary: Send notification to user
+      description: Send a notification to a specific user. Intended for admin use.
+      operationId: sendNotificationToUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - userId
+                - message
+              properties:
+                userId:
+                  $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  description: Target user ID
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+                  description: Notification message
+                  example: "Your account has been verified"
+                link:
+                  type: string
+                  maxLength: 500
+                  description: Optional link/route
+                  example: "/profile"
+                type:
+                  type: string
+                  enum: [info, success, warning, error]
+                  default: info
+                  description: Notification type
+                  example: "success"
+      responses:
+        '201':
+          description: Notification sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Notification sent successfully"
+                  notification:
+                    $ref: '../schemas/models.yaml#/components/schemas/Notification'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "User not found"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /admin/notifications/send-to-all:
+    post:
+      tags:
+        - Admin
+      summary: Send notification to all users
+      description: Send a notification to all users in the system. Intended for admin use.
+      operationId: sendNotificationToAll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - message
+              properties:
+                message:
+                  type: string
+                  minLength: 1
+                  maxLength: 5000
+                  description: Notification message
+                  example: "System maintenance scheduled for tonight"
+                link:
+                  type: string
+                  maxLength: 500
+                  description: Optional link/route
+                  example: "/announcements"
+                type:
+                  type: string
+                  enum: [info, success, warning, error]
+                  default: info
+                  description: Notification type
+                  example: "warning"
+      responses:
+        '201':
+          description: Bulk notification send completed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Bulk notification send completed"
+                  count:
+                    type: integer
+                    description: Number of notifications sent successfully
+                    example: 1245
+                  total:
+                    type: integer
+                    description: Total number of users
+                    example: 1247
+                  errors:
+                    type: array
+                    description: Failed sends (if any)
+                    items:
+                      type: object
+                      properties:
+                        userId:
+                          $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                        success:
+                          type: boolean
+                          example: false
+                        error:
+                          type: string
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

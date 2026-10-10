@@ -1,0 +1,15 @@
+[project]
+name = "gates-fixture"
+version = "0.0.1"
+description = "Minimal stub for gates.py auto-detect tests"
+requires-python = ">=3.10"
+dependencies = []
+
+[dependency-groups]
+dev = ["pytest>=8.0", "ruff>=0.5.0"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

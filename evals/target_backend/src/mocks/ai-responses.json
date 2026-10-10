@@ -1,0 +1,73 @@
+{
+  "_README": {
+    "purpose": "Legacy mock responses for AIWrapper direct calls",
+    "status": "DEPRECATED - Use modular AI services instead",
+    "migration": "New AI tasks should use service pattern (GardenAnalysisService, PlantCareService, etc.)",
+    "details": [
+      "This file supports legacy job types that still use AIWrapper.makeRequest()",
+      "New services (garden_analysis, plant_update_suggestion, weather_based_action, care_recommendation, pest_diagnosis) use programmatic mock generation",
+      "Garden_analysis mock was removed as it's now handled by GardenAnalysisService",
+      "Future: Consider removing this file entirely once all tasks are migrated to modular services"
+    ]
+  },
+  "plant_update_suggestion": {
+    "action": "Water your {plantName} thoroughly and check soil moisture",
+    "reason": "Based on typical care patterns, the plant appears to need watering. The soil should be moist but not waterlogged.",
+    "confidence": 0.85,
+    "additionalInfo": {
+      "nextCheckIn": "3 days",
+      "tips": [
+        "Check if top inch of soil is dry before watering",
+        "Ensure proper drainage"
+      ]
+    }
+  },
+  "weather_based_action": {
+    "action": "Bring sensitive plants indoors or provide frost protection",
+    "reason": "Forecasted temperatures are expected to drop below freezing, which could damage tender plants.",
+    "confidence": 0.9,
+    "additionalInfo": {
+      "affectedPlants": ["tomatoes", "peppers", "basil"],
+      "timeline": "within next 24 hours"
+    }
+  },
+  "care_recommendation": {
+    "action": "Apply balanced fertilizer to your {plantType} during the growing season",
+    "reason": "{plantType} in the {growthStage} stage benefit from regular feeding to support healthy development.",
+    "confidence": 0.8,
+    "additionalInfo": {
+      "fertilizer": "10-10-10 NPK ratio",
+      "frequency": "Every 2-4 weeks",
+      "amount": "Follow package instructions"
+    }
+  },
+  "pest_diagnosis": {
+    "action": "Inspect leaves closely for aphids and treat with insecticidal soap if confirmed",
+    "reason": "The symptoms described ({symptoms}) are consistent with aphid infestation.",
+    "confidence": 0.75,
+    "additionalInfo": {
+      "treatment": "Spray insecticidal soap on affected areas",
+      "prevention": "Encourage beneficial insects like ladybugs",
+      "monitoring": "Check plants every 2-3 days"
+    }
+  },
+  "general": {
+    "action": "Here's guidance on your gardening question",
+    "reason": "This is a mock response to help you develop without API keys. In production, this would contain detailed, context-aware gardening advice.",
+    "confidence": 0.7,
+    "additionalInfo": {
+      "mockMode": true,
+      "message": "Set MOCK_AI=true in .env to use mock responses"
+    }
+  },
+  "_metadata": {
+    "version": "1.0.0",
+    "description": "Mock AI responses for development without API keys",
+    "lastUpdated": "2025-11-09",
+    "notes": [
+      "Use {placeholder} syntax for dynamic values (e.g., {plantName}, {plantType})",
+      "Confidence values can have slight randomization applied (+/- 0.05)",
+      "To add a new response type, simply add a new key matching the AIRequestType"
+    ]
+  }
+}

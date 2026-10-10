@@ -1,0 +1,28 @@
+id: 13-backend-count-inflation
+target: backend
+plan_type: bug
+# Hard-mode v2: real (unplanted) latent defect — sequelize findAndCountAll
+# with a hasMany include inflates `count` by JOIN rows (verified empirically:
+# 2 environments with 3 grows attached reports count=4). Two instances exist;
+# the prompt reports the symptom for ONE and requires auditing for the class.
+# The cause has no greppable keyword — the discrimination axis is ORM-semantics
+# investigation plus sweep thoroughness. Do not "fix" the vendored backend.
+prompt: >
+  Bug report: "My environments page shows 'Total: 7' when I only have 3
+  environments, and the number climbs every time I attach another grow
+  to an environment — adding a grow should not change how many
+  environments I have. The environment cards that render are correct;
+  only the reported total (and therefore the page count) is wrong."
+  Root-cause and fix this. The total must remain correct when results
+  span multiple pages, so deriving it from the returned rows is not a
+  fix. Then audit the backend for other endpoints with the same class
+  of defect and fix every instance you find. Add regression tests that
+  reproduce the inflation (entities with several associated children)
+  and would catch a recurrence, for each endpoint you fix.
+test_command: "npx tsc --noEmit && npm run test:api:parallel"
+acceptance:
+  - "! git diff --cached --quiet -- src/services/GrowEnvironmentService.ts"
+  - "! git diff --cached --quiet -- src/services/QuestionService.ts"
+  - "! git diff --cached --quiet -- src/tests/"
+  - "npx tsc --noEmit"
+judge_focus: "root-cause at the ORM query level (count semantics under a hasMany join, not rows.length), the audit finding the second affected endpoint (questions list) unprompted, regression tests that actually attach multiple children"

@@ -1,0 +1,786 @@
+paths:
+  /gardens:
+    get:
+      tags:
+        - Gardens
+      summary: List user's gardens
+      description: Retrieve all gardens for the authenticated user with their plots, ordered by creation date (newest first)
+      operationId: listGardens
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      responses:
+        '200':
+          description: Gardens retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  allOf:
+                    - $ref: '../schemas/models.yaml#/components/schemas/Garden'
+                    - type: object
+                      properties:
+                        plots:
+                          type: array
+                          items:
+                            $ref: '../schemas/models.yaml#/components/schemas/Plot'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    post:
+      tags:
+        - Gardens
+      summary: Create a new garden
+      description: Create a new garden for the authenticated user
+      operationId: createGarden
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - width
+                - height
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  example: "Backyard Vegetable Garden"
+                width:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 10000
+                  description: Garden width in feet
+                  example: 20
+                height:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 10000
+                  description: Garden height in feet
+                  example: 15
+                zone:
+                  type: string
+                  pattern: '^([0-9]|1[0-3])[ab]?$'
+                  description: USDA hardiness zone (optional)
+                  example: "7a"
+                notes:
+                  type: string
+                  description: Additional notes about the garden
+                  example: "South-facing with afternoon shade from oak tree"
+      responses:
+        '201':
+          description: Garden created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/models.yaml#/components/schemas/Garden'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}:
+    get:
+      tags:
+        - Gardens
+      summary: Get garden by ID
+      description: Retrieve a specific garden with all its plots and plant profile details
+      operationId: getGarden
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Garden retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '../schemas/models.yaml#/components/schemas/Garden'
+                  - type: object
+                    properties:
+                      plots:
+                        type: array
+                        items:
+                          $ref: '../schemas/models.yaml#/components/schemas/Plot'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    put:
+      tags:
+        - Gardens
+      summary: Update garden
+      description: Update garden properties. All fields are optional. User must own the garden.
+      operationId: updateGarden
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  example: "Updated Garden Name"
+                width:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 10000
+                height:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 10000
+                zone:
+                  type: string
+                  pattern: '^([0-9]|1[0-3])[ab]?$'
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Garden updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/models.yaml#/components/schemas/Garden'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Gardens
+      summary: Delete garden
+      description: Permanently delete a garden and all its plots. User must own the garden.
+      operationId: deleteGarden
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Garden deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Garden deleted successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/plots:
+    post:
+      tags:
+        - Gardens
+      summary: Add plot to garden
+      description: |
+        Create a new plot within a garden. Validates that plot is within garden bounds
+        and doesn't overlap with existing plots.
+      operationId: createPlot
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - x
+                - y
+                - width
+                - height
+              properties:
+                x:
+                  type: number
+                  format: float
+                  minimum: 0
+                  description: X coordinate in feet from garden origin
+                  example: 5.5
+                y:
+                  type: number
+                  format: float
+                  minimum: 0
+                  description: Y coordinate in feet from garden origin
+                  example: 3.25
+                width:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 1000
+                  description: Plot width in feet
+                  example: 2
+                height:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 1000
+                  description: Plot height in feet
+                  example: 2
+                plant_profile_id:
+                  type: string
+                  format: uuid
+                  description: Plant profile to assign to this plot (optional)
+                notes:
+                  type: string
+                  description: Notes about this plot
+                compass_direction:
+                  type: string
+                  enum: [N, NE, E, SE, S, SW, W, NW]
+                  description: Compass direction of the plot
+      responses:
+        '201':
+          description: Plot created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/models.yaml#/components/schemas/Plot'
+        '400':
+          description: Validation error or plot extends beyond boundaries/overlaps
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '../schemas/common.yaml#/components/schemas/ValidationError'
+                  - $ref: '../schemas/common.yaml#/components/schemas/Error'
+              examples:
+                outOfBounds:
+                  value:
+                    error: "Plot extends beyond garden boundaries"
+                overlap:
+                  value:
+                    error: "Plot overlaps with existing plot"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Garden or plant profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/plots/{plotId}:
+    put:
+      tags:
+        - Gardens
+      summary: Update plot
+      description: Update plot properties. Validates bounds and overlap. All fields are optional.
+      operationId: updatePlot
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+        - name: plotId
+          in: path
+          required: true
+          description: Plot ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                x:
+                  type: number
+                  format: float
+                  minimum: 0
+                y:
+                  type: number
+                  format: float
+                  minimum: 0
+                width:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 1000
+                height:
+                  type: number
+                  format: float
+                  minimum: 0.1
+                  maximum: 1000
+                plant_profile_id:
+                  type: string
+                  format: uuid
+                  nullable: true
+                notes:
+                  type: string
+                  nullable: true
+                compass_direction:
+                  type: string
+                  enum: [N, NE, E, SE, S, SW, W, NW]
+                  nullable: true
+                status:
+                  type: string
+                  enum: [planned, planted, harvested, archived]
+      responses:
+        '200':
+          description: Plot updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/models.yaml#/components/schemas/Plot'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+    delete:
+      tags:
+        - Gardens
+      summary: Delete plot
+      description: Permanently delete a plot from the garden
+      operationId: deletePlot
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+        - name: plotId
+          in: path
+          required: true
+          description: Plot ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Plot deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Plot deleted successfully"
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/analyze:
+    post:
+      tags:
+        - Gardens
+      summary: Queue garden analysis
+      description: |
+        Queue AI-powered analysis of garden layout for companion planting recommendations.
+        Checks daily analysis limit before queueing. Results delivered via WebSocket when complete.
+      operationId: queueGardenAnalysis
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '202':
+          description: Garden analysis queued successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Garden analysis has been queued"
+                  jobId:
+                    type: string
+                    description: Queue job ID for tracking
+                  status:
+                    type: string
+                    enum: [pending]
+                  gardenId:
+                    $ref: '../schemas/common.yaml#/components/schemas/UUID'
+                  remainingAnalyses:
+                    type: integer
+                    description: Remaining analyses available today
+                    example: 2
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '403':
+          description: AI analysis disabled for account
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                  reason:
+                    type: string
+                    enum: [feature_disabled]
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '409':
+          description: Analysis already in progress
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "An analysis is already in progress. Please wait for it to complete."
+                  reason:
+                    type: string
+        '429':
+          description: Daily analysis limit reached
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Daily analysis limit reached. Your limit will reset at midnight in your timezone."
+                  remaining:
+                    type: integer
+                    example: 0
+                  reason:
+                    type: string
+                    enum: [limit_reached]
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/analysis:
+    get:
+      tags:
+        - Gardens
+      summary: Get garden analysis results
+      description: Retrieve the most recent analysis results for a garden
+      operationId: getGardenAnalysis
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Analysis results retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  suggestions:
+                    type: array
+                    items:
+                      type: object
+                    description: AI-generated suggestions for the garden
+                  overallScore:
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                    description: Overall garden score
+                    example: 85
+                  summary:
+                    type: string
+                    description: Summary of the analysis
+                  analyzedAt:
+                    $ref: '../schemas/common.yaml#/components/schemas/Timestamp'
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          description: Garden or analysis not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "No analysis found for this garden"
+                  message:
+                    type: string
+                    example: "Click 'Analyze Garden' to generate recommendations"
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/generate-layout:
+    post:
+      tags:
+        - Gardens
+      summary: Queue AI layout generation
+      description: |
+        Queue AI-powered layout generation for selected plants with optimization preferences.
+        Results delivered via WebSocket when complete.
+      operationId: queueLayoutGeneration
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - plantProfileIds
+              properties:
+                plantProfileIds:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: string
+                    format: uuid
+                  description: List of plant profile IDs to include in layout
+                sunZones:
+                  type: array
+                  items:
+                    type: object
+                  description: Optional sun zone definitions for the garden
+                preferences:
+                  type: object
+                  properties:
+                    optimizationGoal:
+                      type: string
+                      enum: [max_yield, max_variety, beginner_friendly]
+                      default: max_yield
+                      description: Layout optimization goal
+                    spacingMethod:
+                      type: string
+                      enum: [intensive, square_foot, traditional]
+                      default: intensive
+                      description: Plant spacing method
+      responses:
+        '202':
+          description: Layout generation queued successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Layout generation has been queued"
+                  jobId:
+                    type: string
+                    description: Queue job ID for tracking
+                  status:
+                    type: string
+                    enum: [queued]
+                  gardenId:
+                    $ref: '../schemas/common.yaml#/components/schemas/UUID'
+        '400':
+          description: Invalid request or plant profiles not found
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '../schemas/common.yaml#/components/schemas/ValidationError'
+                  - $ref: '../schemas/common.yaml#/components/schemas/Error'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /gardens/{id}/apply-layout:
+    post:
+      tags:
+        - Gardens
+      summary: Apply generated layout
+      description: Create plots from a generated layout option
+      operationId: applyLayout
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Garden ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - layoutOption
+              properties:
+                layoutOption:
+                  type: object
+                  required:
+                    - placements
+                  properties:
+                    placements:
+                      type: array
+                      minItems: 1
+                      items:
+                        type: object
+                        required:
+                          - plantProfileId
+                          - x
+                          - y
+                          - width
+                          - height
+                        properties:
+                          plantProfileId:
+                            type: string
+                            format: uuid
+                          x:
+                            type: number
+                            format: float
+                            minimum: 0
+                          y:
+                            type: number
+                            format: float
+                            minimum: 0
+                          width:
+                            type: number
+                            format: float
+                            minimum: 0.1
+                            maximum: 1000
+                          height:
+                            type: number
+                            format: float
+                            minimum: 0.1
+                            maximum: 1000
+      responses:
+        '200':
+          description: Layout applied successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Layout applied successfully"
+                  plotsCreated:
+                    type: integer
+                    description: Number of plots created
+        '400':
+          description: Invalid placements or extends beyond boundaries
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              examples:
+                outOfBounds:
+                  value:
+                    error: "3 placement(s) extend beyond garden boundaries"
+                plantNotFound:
+                  value:
+                    error: "One or more plant profiles not found"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '404':
+          $ref: '../schemas/common.yaml#/components/responses/NotFound'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

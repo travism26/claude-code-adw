@@ -1,0 +1,12 @@
+/* Global styles for GrowBuddy - Chakra UI replaces most utility classes */
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Custom utility classes if needed */
+.text-balance {
+  text-wrap: balance;
+}

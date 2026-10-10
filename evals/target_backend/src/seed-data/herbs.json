@@ -1,0 +1,338 @@
+[
+  {
+    "name": "Basil",
+    "species": "Ocimum basilicum",
+    "common_name": "Sweet Basil",
+    "type": "herb",
+    "default_water_interval_days": 2,
+    "default_fert_interval_days": 14,
+    "zone_min": 10,
+    "zone_max": 11,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained, rich soil",
+    "spacing_inches": 12,
+    "plant_family": "Lamiaceae",
+    "description": "A tender herb grown for aromatic leaves used in cooking.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/basil.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 8,
+        "season": "spring",
+        "tip_text": "Start indoors 4–6 weeks before last frost.",
+        "timing_weeks": -6,
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "name": "Thyme",
+    "species": "Thymus vulgaris",
+    "common_name": "Common Thyme",
+    "type": "herb",
+    "default_water_interval_days": 5,
+    "default_fert_interval_days": 30,
+    "zone_min": 4,
+    "zone_max": 9,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained, sandy soil",
+    "spacing_inches": 12,
+    "plant_family": "Lamiaceae",
+    "description": "A hardy, aromatic perennial herb used for culinary purposes.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/thyme.svg",
+    "tips": [
+      {
+        "zone_min": 4,
+        "zone_max": 9,
+        "season": "spring",
+        "tip_text": "Trim lightly after flowering to maintain shape.",
+        "timing_weeks": 8,
+        "priority": 6
+      }
+    ]
+  },
+  {
+    "name": "Oregano",
+    "species": "Origanum vulgare",
+    "common_name": "Greek Oregano",
+    "type": "herb",
+    "default_water_interval_days": 4,
+    "default_fert_interval_days": 30,
+    "zone_min": 4,
+    "zone_max": 9,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 12,
+    "plant_family": "Lamiaceae",
+    "description": "A Mediterranean perennial herb with strong aromatic flavor.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/oregano.svg",
+    "tips": [
+      {
+        "zone_min": 4,
+        "zone_max": 9,
+        "season": "summer",
+        "tip_text": "Harvest regularly to promote new growth.",
+        "timing_weeks": 6,
+        "priority": 8
+      }
+    ]
+  },
+  {
+    "name": "Parsley",
+    "species": "Petroselinum crispum",
+    "common_name": "Garden Parsley",
+    "type": "herb",
+    "default_water_interval_days": 3,
+    "default_fert_interval_days": 21,
+    "zone_min": 3,
+    "zone_max": 9,
+    "sunlight_requirements": "partial_sun",
+    "soil_type": "Moist, rich soil",
+    "spacing_inches": 8,
+    "plant_family": "Apiaceae",
+    "description": "A biennial herb commonly used fresh in cooking.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/parsley.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 7,
+        "season": "spring",
+        "tip_text": "Soak seeds overnight to improve germination.",
+        "timing_weeks": -1,
+        "priority": 9
+      }
+    ]
+  },
+  {
+    "name": "Cilantro",
+    "species": "Coriandrum sativum",
+    "common_name": "Coriander",
+    "type": "herb",
+    "default_water_interval_days": 3,
+    "default_fert_interval_days": 21,
+    "zone_min": 2,
+    "zone_max": 11,
+    "sunlight_requirements": "partial_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 6,
+    "plant_family": "Apiaceae",
+    "description": "Cool-season herb with leaves known as cilantro and seeds as coriander.",
+    "difficulty": "moderate",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/cilantro.svg",
+    "tips": [
+      {
+        "zone_min": 2,
+        "zone_max": 7,
+        "season": "spring",
+        "tip_text": "Plant every 2–3 weeks for continuous harvest.",
+        "timing_weeks": 0,
+        "priority": 8
+      }
+    ]
+  },
+  {
+    "name": "Dill",
+    "species": "Anethum graveolens",
+    "common_name": "Garden Dill",
+    "type": "herb",
+    "default_water_interval_days": 3,
+    "default_fert_interval_days": 21,
+    "zone_min": 3,
+    "zone_max": 9,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 12,
+    "plant_family": "Apiaceae",
+    "description": "A tall annual herb used for pickling and seasoning.",
+    "difficulty": "easy",
+    "indoor_outdoor": "outdoor",
+    "icon_url": "/plant-icons/herb/dill.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 9,
+        "season": "summer",
+        "tip_text": "Stake tall plants to prevent flopping.",
+        "timing_weeks": 5,
+        "priority": 6
+      }
+    ]
+  },
+  {
+    "name": "Chives",
+    "species": "Allium schoenoprasum",
+    "common_name": "Common Chives",
+    "type": "herb",
+    "default_water_interval_days": 4,
+    "default_fert_interval_days": 30,
+    "zone_min": 3,
+    "zone_max": 9,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Moist, rich soil",
+    "spacing_inches": 8,
+    "plant_family": "Amaryllidaceae",
+    "description": "A hardy perennial herb with edible leaves and flowers.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/chives.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 9,
+        "season": "spring",
+        "tip_text": "Divide clumps every 2–3 years to maintain vigor.",
+        "timing_weeks": 4,
+        "priority": 7
+      }
+    ]
+  },
+  {
+    "name": "Rosemary",
+    "species": "Salvia rosmarinus",
+    "common_name": "Rosemary",
+    "type": "herb",
+    "default_water_interval_days": 5,
+    "default_fert_interval_days": 45,
+    "zone_min": 7,
+    "zone_max": 10,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Sandy, well-drained soil",
+    "spacing_inches": 18,
+    "plant_family": "Lamiaceae",
+    "description": "A woody perennial herb with aromatic needle-like leaves.",
+    "difficulty": "moderate",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/rosemary.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 6,
+        "season": "winter",
+        "tip_text": "Bring indoors before frost; provide bright light.",
+        "timing_weeks": -2,
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "name": "Sage",
+    "species": "Salvia officinalis",
+    "common_name": "Common Sage",
+    "type": "herb",
+    "default_water_interval_days": 5,
+    "default_fert_interval_days": 45,
+    "zone_min": 4,
+    "zone_max": 8,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 18,
+    "plant_family": "Lamiaceae",
+    "description": "A perennial culinary herb with aromatic gray-green leaves.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/sage.svg",
+    "tips": [
+      {
+        "zone_min": 4,
+        "zone_max": 8,
+        "season": "summer",
+        "tip_text": "Trim lightly after flowering to prevent woodiness.",
+        "timing_weeks": 10,
+        "priority": 5
+      }
+    ]
+  },
+  {
+    "name": "Mint",
+    "species": "Mentha spicata",
+    "common_name": "Spearmint",
+    "type": "herb",
+    "default_water_interval_days": 2,
+    "default_fert_interval_days": 21,
+    "zone_min": 3,
+    "zone_max": 9,
+    "sunlight_requirements": "partial_sun",
+    "soil_type": "Moist soil",
+    "spacing_inches": 18,
+    "plant_family": "Lamiaceae",
+    "description": "A fast-spreading culinary herb grown for fresh leaves.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/mint.svg",
+    "tips": [
+      {
+        "zone_min": 3,
+        "zone_max": 9,
+        "season": "spring",
+        "tip_text": "Grow in containers to prevent spreading.",
+        "timing_weeks": 0,
+        "priority": 10
+      }
+    ]
+  },
+  {
+    "name": "Tarragon",
+    "species": "Artemisia dracunculus",
+    "common_name": "French Tarragon",
+    "type": "herb",
+    "default_water_interval_days": 4,
+    "default_fert_interval_days": 30,
+    "zone_min": 4,
+    "zone_max": 9,
+    "sunlight_requirements": "full_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 18,
+    "plant_family": "Asteraceae",
+    "description": "A perennial herb valued for its anise-like flavor.",
+    "difficulty": "moderate",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/tarragon.svg",
+    "tips": [
+      {
+        "zone_min": 4,
+        "zone_max": 9,
+        "season": "spring",
+        "tip_text": "Divide plants every 3 years to maintain flavor.",
+        "timing_weeks": 4,
+        "priority": 6
+      }
+    ]
+  },
+  {
+    "name": "Lemon Balm",
+    "species": "Melissa officinalis",
+    "common_name": "Lemon Balm",
+    "type": "herb",
+    "default_water_interval_days": 3,
+    "default_fert_interval_days": 21,
+    "zone_min": 4,
+    "zone_max": 9,
+    "sunlight_requirements": "partial_sun",
+    "soil_type": "Well-drained soil",
+    "spacing_inches": 18,
+    "plant_family": "Lamiaceae",
+    "description": "A vigorous perennial herb with a strong lemon scent.",
+    "difficulty": "easy",
+    "indoor_outdoor": "both",
+    "icon_url": "/plant-icons/herb/lemon-balm.svg",
+    "tips": [
+      {
+        "zone_min": 4,
+        "zone_max": 9,
+        "season": "summer",
+        "tip_text": "Cut back to encourage bushy growth.",
+        "timing_weeks": 6,
+        "priority": 7
+      }
+    ]
+  }
+]

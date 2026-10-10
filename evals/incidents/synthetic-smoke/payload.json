@@ -1,0 +1,16 @@
+{
+  "incident_id": "synthetic-smoke-001",
+  "source": "manual",
+  "alert_name": "Redis load high (synthetic)",
+  "severity": "warning",
+  "resource": "redis-synthetic-cache-01",
+  "resource_class": "redis",
+  "metric": "redis.cpu.load",
+  "threshold": 0.80,
+  "observed_value": 0.85,
+  "fired_at": "2026-07-12T14:05:00Z",
+  "links": [],
+  "raw": {
+    "note": "hand-written synthetic payload — not a real Datadog export, see README.md"
+  }
+}

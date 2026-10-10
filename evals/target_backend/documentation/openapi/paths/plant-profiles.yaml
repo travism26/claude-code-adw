@@ -1,0 +1,175 @@
+paths:
+  /plant-profiles:
+    get:
+      tags:
+        - Plant Profiles
+      summary: Browse plant database
+      description: |
+        Retrieve plant profiles with pagination and filtering.
+        Supports filtering by type, difficulty, zone compatibility, and text search.
+        Results are ordered alphabetically by name.
+      operationId: listPlantProfiles
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - $ref: '../schemas/common.yaml#/components/parameters/PageParam'
+        - $ref: '../schemas/common.yaml#/components/parameters/LimitParam'
+        - name: type
+          in: query
+          description: Filter by plant type
+          schema:
+            type: string
+            enum: [vegetable, herb, flower, fruit, houseplant, tree, shrub]
+        - name: difficulty
+          in: query
+          description: Filter by difficulty level
+          schema:
+            type: string
+            enum: [easy, moderate, challenging]
+        - name: zone
+          in: query
+          description: Filter by USDA hardiness zone compatibility (1-13)
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 13
+        - name: search
+          in: query
+          description: Search in name, species, or common name
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        '200':
+          description: Plant profiles retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  plantProfiles:
+                    type: array
+                    items:
+                      $ref: '../schemas/models.yaml#/components/schemas/PlantProfile'
+                  page:
+                    type: integer
+                    example: 1
+                  limit:
+                    type: integer
+                    example: 20
+                  total:
+                    type: integer
+                    description: Total number of matching profiles
+                    example: 150
+                  totalPages:
+                    type: integer
+                    description: Total number of pages
+                    example: 8
+        '400':
+          $ref: '../schemas/common.yaml#/components/responses/BadRequest'
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /plant-profiles/search:
+    get:
+      tags:
+        - Plant Profiles
+      summary: Search plant profiles
+      description: |
+        Search for plant profiles by name, species, or common name.
+        Returns up to 50 results ordered alphabetically.
+      operationId: searchPlantProfiles
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          description: Search query (minimum 1 character)
+          schema:
+            type: string
+            minLength: 1
+          example: "tomato"
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '../schemas/models.yaml#/components/schemas/PlantProfile'
+                maxItems: 50
+        '400':
+          description: Invalid or missing search query
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '../schemas/common.yaml#/components/schemas/Error'
+                  - $ref: '../schemas/common.yaml#/components/schemas/ValidationError'
+              examples:
+                missingQuery:
+                  value:
+                    error: "Search query parameter 'q' is required"
+                invalidQuery:
+                  value:
+                    errors:
+                      - msg: "Search query must be at least 1 character"
+                        param: "q"
+                        location: "query"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'
+
+  /plant-profiles/{id}:
+    get:
+      tags:
+        - Plant Profiles
+      summary: Get plant profile with seasonal tips
+      description: |
+        Retrieve a specific plant profile by ID along with its seasonal tips.
+        Seasonal tips are filtered by zone and season when available.
+      operationId: getPlantProfile
+      security:
+        - BearerAuth: []
+        - CookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Plant profile ID
+          schema:
+            $ref: '../schemas/common.yaml#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Plant profile retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  profile:
+                    $ref: '../schemas/models.yaml#/components/schemas/PlantProfile'
+                  seasonalTips:
+                    type: array
+                    description: Seasonal growing tips for this plant
+                    items:
+                      $ref: '../schemas/models.yaml#/components/schemas/SeasonalTip'
+        '404':
+          description: Plant profile not found
+          content:
+            application/json:
+              schema:
+                $ref: '../schemas/common.yaml#/components/schemas/Error'
+              example:
+                error: "Plant profile not found"
+        '401':
+          $ref: '../schemas/common.yaml#/components/responses/Unauthorized'
+        '500':
+          $ref: '../schemas/common.yaml#/components/responses/InternalServerError'

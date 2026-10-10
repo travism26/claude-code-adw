@@ -1,0 +1,89 @@
+// Starter settings for a context diet.
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// READ THIS BEFORE COPYING
+//
+// This file is annotated, which means it is NOT valid JSON as written. That is
+// deliberate. It is meant to be read and decided on line by line, not pasted.
+// Strip the comments before use.
+//
+// THE RULE: opt out, never opt in blind. Every entry below is something that
+// someone, somewhere, uses daily. Removing a capability you actually need does
+// not save you anything — it costs you the capability plus the twenty minutes
+// you will later spend working out why something stopped working, having
+// forgotten you disabled it.
+//
+// So for each line: do YOU use this? If yes, delete the line. If you are not
+// sure, leave it enabled and revisit after a week of paying attention.
+//
+// Measure your baseline before and after. Open a fresh session, do nothing,
+// read the context meter. That number is what every session costs you before
+// you type. Getting from the mid-tens of thousands into the low teens is a
+// normal result.
+//
+// See: ../foundations/02-context-diet.md
+// ─────────────────────────────────────────────────────────────────────────────
+
+{
+  "permissions": {
+    // Each denied tool removes its definition — name, description, and full
+    // parameter schema — from every session's baseline. Individually small,
+    // collectively significant.
+    //
+    // These are examples, not recommendations. Your list should come from
+    // looking at what you actually call.
+    "deny": [
+      "NotebookEdit",       // Jupyter notebook editing. Delete if you work in notebooks.
+      "CronCreate",         // Scheduling. Delete if you schedule recurring agent work.
+      "CronDelete",
+      "CronList",
+      "PushNotification",   // Delete if you run long background work and want to be pinged.
+      "RemoteTrigger",
+      "ScheduleWakeup"
+    ]
+  },
+
+  // Connectors inject the full tool schemas of every connected integration into
+  // every session, whether or not you call them. This is the single most
+  // commonly underestimated cost in the baseline — an integration used twice a
+  // month charges you on every session in between.
+  //
+  // If you use connectors regularly, leave this out entirely and instead prune
+  // the specific connectors you have attached.
+  "disableClaudeAiConnectors": true,
+
+  // Artifact generation. Disable only if you never ask for standalone
+  // documents or visualizations from within a session.
+  "disableArtifact": true,
+
+  // A status line showing live context usage is the single most useful setting
+  // in this file. You cannot manage what you cannot see, and the whole practice
+  // depends on noticing where you are in the window.
+  //
+  // Replace with whatever status line tool you prefer — the requirement is that
+  // token usage is visible at a glance, not which tool provides it.
+  "statusLine": {
+    "type": "command",
+    "command": "npx ccstatusline@latest"
+  }
+
+  // NOT SHOWN, BUT USUALLY THE BIGGEST WIN:
+  //
+  // Your global instruction file (~/.claude/CLAUDE.md or equivalent). It loads
+  // on every session regardless of relevance, and it grows monotonically
+  // because adding to it feels free.
+  //
+  // Apply the pruning test to every line: "would removing this cause the agent
+  // to make a mistake?" Most lines fail. Anything specific to one kind of task
+  // belongs in a skill, which costs one listing line until it is invoked.
+  //
+  // The strong version of this move is to have no global instruction file at
+  // all, and let project-level files carry only what is genuinely
+  // project-specific. Global instructions are by definition the ones least
+  // likely to apply to the session in front of you.
+  //
+  // Beyond the token cost, oversized instruction files stop working as
+  // instructions: Anthropic's documentation warns that bloated context files
+  // cause the model to ignore your actual instructions, and Cursor caps its
+  // rules files at 500 lines. A shorter file is followed more closely.
+}

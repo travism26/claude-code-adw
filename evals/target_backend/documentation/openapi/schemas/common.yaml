@@ -1,0 +1,193 @@
+components:
+  schemas:
+    Error:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: string
+          description: Error message describing what went wrong
+          example: "Invalid credentials"
+
+    ValidationError:
+      type: object
+      required:
+        - errors
+      properties:
+        errors:
+          type: array
+          description: Array of validation errors from express-validator
+          items:
+            type: object
+            properties:
+              msg:
+                type: string
+                description: Validation error message
+                example: "Invalid value"
+              param:
+                type: string
+                description: Parameter that failed validation
+                example: "email"
+              location:
+                type: string
+                description: Location of the parameter (body, query, params)
+                example: "body"
+              value:
+                description: The invalid value that was provided
+                example: "not-an-email"
+
+    SuccessMessage:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Success message
+          example: "Operation completed successfully"
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: Total number of items
+          example: 100
+        page:
+          type: integer
+          description: Current page number (1-indexed)
+          example: 1
+        limit:
+          type: integer
+          description: Number of items per page
+          example: 20
+        totalPages:
+          type: integer
+          description: Total number of pages
+          example: 5
+
+    UUID:
+      type: string
+      format: uuid
+      pattern: '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+      example: "123e4567-e89b-12d3-a456-426614174000"
+
+    Timestamp:
+      type: string
+      format: date-time
+      description: ISO 8601 timestamp
+      example: "2024-01-15T10:30:00.000Z"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from /auth/login or /auth/signup
+
+    CookieAuth:
+      type: apiKey
+      in: cookie
+      name: accessToken
+      description: JWT access token stored in HTTP-only cookie
+
+  parameters:
+    LimitParam:
+      name: limit
+      in: query
+      description: Number of items to return per page
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+
+    PageParam:
+      name: page
+      in: query
+      description: Page number (1-indexed)
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+
+    SortParam:
+      name: sort
+      in: query
+      description: Sort field
+      schema:
+        type: string
+
+    OrderParam:
+      name: order
+      in: query
+      description: Sort order
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: desc
+
+  responses:
+    BadRequest:
+      description: Bad request - validation errors or malformed request
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/Error'
+              - $ref: '#/components/schemas/ValidationError'
+
+    Unauthorized:
+      description: Unauthorized - missing or invalid authentication token
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "No token provided"
+
+    Forbidden:
+      description: Forbidden - authenticated but not authorized for this resource
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Access denied"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Resource not found"
+
+    Conflict:
+      description: Conflict - resource already exists or state conflict
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Email already registered"
+
+    TooManyRequests:
+      description: Too many requests - rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "Daily analysis limit reached"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "An unexpected error occurred"

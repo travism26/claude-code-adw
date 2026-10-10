@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: notes-service
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:notes}
+    username: ${DB_USER:notes}
+    password: ${DB_PASSWORD:notes}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+server:
+  port: ${SERVER_PORT:8080}
