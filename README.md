@@ -3,6 +3,14 @@
 A general-purpose agentic developer workflow harness for Claude Code, structured
 as **templates + install command** so it can be dropped into any project.
 
+It is a working example of agentic coding and harness engineering: an agent
+harness that drives Claude Code (via the CLI or the Claude Agent SDK) through a
+spec-driven SDLC — research, plan, build, test, review, document — and keeps its
+context engineering in slash-command templates, a per-project agent memory store
+and git-worktree-isolated runs. Every change to the harness itself is measured
+with eval-driven development: a fixed coding-agent benchmark graded by code checks
+and an LLM-as-judge, with pass@k reliability gating and best-of-N build selection.
+
 Everything runs with `uv run` — no global Python environment required; each script
 declares its dependencies inline (PEP 723).
 
@@ -142,7 +150,7 @@ uv run adws/adw_prompt.py "Explain this codebase" --model sonnet
 # Single slash command
 uv run adws/adw_slash_command.py /chore "Rename config module"
 
-# Full local SDLC (research → plan → build → validate → test → review → document)
+# Full local agentic SDLC (research → plan → build → validate → test → review → document)
 uv run adws/travis/travis_sdlc.py "Add user export feature" --plan-type feature
 
 # Swappable spec generator: use OpenSpec for the research+plan phases
@@ -225,7 +233,9 @@ progress log, and the agent is told to route around them. Audit the rules:
 ## Parallel & multi-repo execution
 
 The pipeline normally runs **in place** in `--working-dir`. Three layered options
-let you isolate a run and fan work out across many features or many repos. All
+let you isolate a run in its own git worktree and fan work out across many
+features or many repos — multi-agent orchestration, one parent run spawning and
+collecting children. All
 three share one worktree path (`adws/adw_modules/feature_worktree.py`) and one
 child-spawn/collect path (`adws/adw_modules/child_run.py`); state and logs stay
 under the harness `agents/<adw_id>/` keyed by `adw_id`, so concurrent runs never
@@ -319,7 +329,7 @@ guarded credential-free by `adws/adw_tests/test_feature_worktree.py`.
 > 15-slot port range (`worktree_ops.find_next_available_ports`); runners refuse
 > `--max-parallel > 15`.
 
-## Memory & the knowledge base
+## Agent memory & the knowledge base
 
 **Do you get it automatically, or set it up?** The *mechanism* ships ready —
 nothing to install, no database, no service to run. But the *knowledge base
@@ -370,14 +380,14 @@ human-readable, diff-reviewable, and travels with the repo. At this scale,
 full-context injection beats retrieval — there's no embedding drift or
 relevance-ranking to debug. Full spec: `adws/travis/MEMORY_CONTRACT.md`.
 
-## Evals — is a harness change good or bad?
+## Evals — eval-driven development: is a harness change good or bad?
 
 Open-ended feature work can't be graded like a unit test, so the harness ships a
 benchmark: **fixed sample codebases** (`evals/target_app/` and
 `evals/target_backend/`) plus **14 fixed tasks across two tiers** (features,
 bugs, chores). Each trial copies the target to a clean temp dir, runs the full
-SDLC against it, and grades the outcome. Run every task N times (default 3) per
-**variant** and compare:
+SDLC against it, and grades the outcome with code graders plus an LLM-as-judge.
+Run every task N times (default 3) per **variant** and compare:
 
 ```bash
 # A/B test two planners (same checked-out code, different flag)
@@ -489,3 +499,22 @@ from how leading coding-agent teams work, is in `evals/EVAL_PRACTICES.md`.
 - `adws/README.md` — harness architecture and philosophy
 - `adws/ADW_SETUP_GUIDE.md` — detailed setup, phases, parallel worktree execution
 - `adws/building-llm-powered-workflows.md` — workflow design patterns
+
+## Related concepts and keywords
+
+This project is relevant if you are searching for: agentic coding, AI coding
+agents, agent harness, harness engineering, context engineering, spec-driven
+development, agentic workflows, agentic engineering, AI SDLC, autonomous software
+engineering, long-running unattended agent runs, Claude Code, Claude Agent SDK,
+Anthropic Claude, slash-command templates, Claude Code hooks (PreToolUse), MCP
+server configuration (`.mcp.json` / `--mcp-config` pass-through), LLM evals, agent
+evals, eval harness, eval-driven development, coding-agent benchmark, pass@k and
+pass^k reliability gating, LLM-as-judge, deterministic code graders, best-of-N
+build selection, A/B testing of harness changes, model × effort sweeps,
+multi-agent orchestration, subagents and fan-out, parallel coding agents, git
+worktree isolation, multi-repo orchestration, GitHub-issue-driven tickets, agent
+memory, memory consolidation ("dreaming"), self-improving harness (regression and
+eval-task capture), risk gate for destructive commands, human-in-the-loop spec
+review, swappable planners (OpenSpec today, Spec Kit adapter planned),
+incident-triage pipeline, LLM-powered workflows, a structured alternative to vibe
+coding, and PEP 723 `uv run` scripts.
