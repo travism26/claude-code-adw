@@ -1,78 +1,149 @@
 ---
 name: verify
-description: Verify a change works by running the app and observing real behavior in the browser — not by reading code. Use aggressively whenever you touch frontend or backend code, and before declaring UI work done. For non-UI claims (scripts, evals, graders), use validate-work instead.
+description: Verify a change works by running the app and observing real behavior — HTTP probes for a backend, real interaction for a UI — graded by a fresh agent against claims fixed before the run, with evidence saved to disk. Use whenever you touch frontend or backend code, and before declaring app work done. For non-app claims (scripts, evals, graders), use validate-work instead.
 ---
 
 # Verify
 
-A change is verified only when you have **run the app and observed the expected
-behavior happen**. `tsc` passing, a green build, or "the code looks right" is
-review — not verification. State what you expect to see *before* you look, then
-confirm you actually saw it. Clicking around and seeing no crash is not
-verification; it's theater.
+A change is verified when an agent **other than its author** has run the real
+app, exercised every claim, and left **evidence** on disk that each claim holds.
+Green tests, a clean build, and "the code looks right" are proxies; the author's
+own belief carries zero weight. The **oracle** (what counts as correct) is fixed
+before the app boots and is never edited to make a run pass.
 
-For non-UI deliverables (a script, an eval, a grader, a doc), this skill is the
-wrong tool — use [validate-work](../validate-work/SKILL.md), which executes
-claims (including a failure path) and records misses to `LESSONS.md`.
+For non-app deliverables (a script, an eval, a grader, a doc), use
+[validate-work](../validate-work/SKILL.md) instead.
 
-## Procedure
+## Author or verifier: pick your role first
 
-### 1. State the expected behavior
-Before booting anything, write down the concrete, observable claims this change
-makes — e.g. "submitting the form with an empty email shows an inline error",
-"the dashboard now shows the new column". Each claim is what you will confirm or
-refute. No claim → nothing to verify.
+- **Author**: you wrote or changed the code in this context. You do not grade it.
+  Run step 1 yourself, then dispatch a fresh verifier subagent
+  (`general-purpose`) with the brief below and nothing else: no transcript, no
+  reasoning about why the code is right. Relay its report verbatim.
+- **Verifier**: you were dispatched with a brief, or you are checking a change
+  you did not write. Run steps 1–8.
 
-### 2. Discover how to run the app (do not assume)
-The dev command and port are project-specific. Find them, don't hardcode them:
-- Read `package.json` `scripts` (`dev`, `start`) and the package manager
-  (`pnpm`/`npm`/`yarn`/`bun` — check the lockfile).
-- Find the port: framework config (`vite.config`, `next.config`), `.env`
-  (`PORT=`), or the script flags. Vite defaults to `5173`, Next/CRA to `3000` —
-  but confirm, don't guess.
-- Note whether frontend and backend are separate processes and how each starts.
+Verifier brief (the author fills the angle brackets):
 
-### 3. Boot it cleanly (and don't leak processes)
-- **Check if it's already running first** (`curl -s localhost:<port>` or
-  `lsof -i :<port>`). Reuse a live server instead of starting a second one.
-- Start the dev server **in the background** so it doesn't block, and **record
-  the PID** so you can stop it.
-- Wait for readiness by polling the health/root URL until it responds — don't
-  sleep a fixed guess.
-- When done (or before re-running), **kill the process you started**. Used
-  aggressively, this skill will otherwise stack orphaned servers fighting over
-  the port.
+```
+Verify <repo path> at commit <sha> (diff: <base>..<sha>) using the verify skill
+at <path to this SKILL.md>. Read it in full first; you are the verifier.
+Claims (the oracle; do not change them):
+- C1: <observable claim> — expected: <what you will see>
+- C2: ...
+Launch recipe, if known: <command, port, readiness URL, auth fixtures>
+```
 
-### 4. Drive the real UI
-- Use the Claude-in-Chrome MCP tools to open the app and exercise **every claim
-  from step 1**, plus any feature touched by the change and anything named in
-  `$ARGUMENTS`.
-- Prefer real interaction (click, type, navigate) over reading the DOM.
-- Correlate with evidence when behavior is ambiguous: console messages
-  (`read_console_messages`), network requests (`read_network_requests`), and
-  server logs.
+**Fix loop.** On FAIL, the author fixes and dispatches a *new* verifier (never
+resumes the old one). Two fix cycles at most; after that, stop and report to
+the user with the evidence so far. An honest stop beats a third attempt.
 
-### 5. Judge against the expected behavior
-For each claim from step 1: **confirmed** (state what you observed) or
-**refuted** (state what happened instead). A claim you couldn't exercise is
-*not* confirmed — say so.
+## Procedure (verifier)
 
-### 6. Handle the failure path honestly
-If the app won't boot, the health check never goes green, or a feature is
-broken: **report it as a finding and do NOT mark the work verified.** Capture
-the error (console, network, logs). Don't smooth it over or assume it's
-environmental without evidence.
+### 1. Fix the oracle
+List the concrete, observable claims, each with its **expected observation**
+("POST /notes with an empty title returns 400 and the note count is unchanged",
+"the dashboard shows the new column at 375px wide"). Source them from the
+ticket/spec and the diff, not from the author's narration. Every claim gets at
+least one **negative probe**: an input or path where the app must refuse, fail
+loudly, or stay unchanged. A claim with no expected observation cannot pass;
+mark it INCONCLUSIVE now. When verifying a bug fix, also record what the bug
+looked like, so step 4 can show it is gone.
 
-## Verdict
+Write the claims to `.verify/<short-sha>/claims.md` before booting anything.
+From here on, claims, tests, probes and journey specs are **read-only**: if one
+is wrong, report FLAG with the change you would propose, and leave the file as
+it is.
 
-End with exactly one of:
-- **VERIFIED** — every claim exercised in the running app and observed as expected.
-- **VERIFIED WITH GAPS** — core claims confirmed; named claims couldn't be exercised, with reasons.
-- **NOT VERIFIED** — a claim was refuted or the app couldn't be run; list what's broken.
+### 2. Launch
+Use the project's verify recipe (`.claude/verify-recipe.md`) if it has one;
+otherwise discover the launch command from the environment (`package.json`
+scripts and lockfile, `pyproject.toml`, framework config, `.env` `PORT=`).
+- Check whether it is already running (`lsof -i :<port>`); reuse a live server.
+- Start it in the background with output to `.verify/<short-sha>/server.log`,
+  and record the PID.
+- Poll the health or root URL until it answers. A fixed `sleep` is a guess.
 
-Never report VERIFIED on the strength of a passing build or code reading alone.
+### 3. Doctor (read-only health check)
+Before driving anything, confirm the environment can produce a verdict:
+readiness answers 2xx, the routes or pages the claims touch respond, required
+services (DB, queue) are up, migrations applied. A Doctor failure makes the run
+INCONCLUSIVE (environment), not FAIL. Capture the error either way.
+
+### 4. Drive
+Exercise every claim from step 1 against the running app: happy path and
+negative probe. Read [PROBES.md](PROBES.md) for the branch you are on: the
+**backend probe matrix** for HTTP APIs, the **UI journey** rules for frontends,
+or both. Save each request/response, screenshot or console dump under
+`.verify/<short-sha>/evidence/` as you go; an observation with no file behind it
+did not happen.
+
+### 5. Observe
+Read what the app said while you drove it: `server.log` for errors and stack
+traces during the run window, browser console and network panel for UIs, any
+metrics endpoint for 5xx counts. A 5xx the probes did not assert on, or an
+ERROR log line during a "passing" probe, is a finding.
+
+### 6. Grade
+Grade each claim on its own, against the evidence only:
+- **PASS**: expected observation seen, negative probe refused as expected, and
+  at least one evidence path cited.
+- **FAIL**: observed something else. Quote what happened instead.
+- **INCONCLUSIVE**: couldn't exercise it (environment broke, oracle missing).
+  Never downgrade a FAIL to INCONCLUSIVE.
+
+Then check the diff for **hack flags**: edited or deleted tests, weakened or
+removed assertions, added `skip`/`xfail`/`fixme`, special-casing of test
+inputs, or a broadened locator. Any hack flag makes the overall verdict FLAG,
+whatever the claims scored. A change that turns out unnecessary (the behavior
+already held) is a legitimate result; report it as such.
+
+### 7. Evidence
+Write `.verify/<short-sha>/report.json`:
+
+```json
+{
+  "commit": "<full sha>",
+  "verifier_model": "<model id>",
+  "verdict": "VERIFIED | NOT VERIFIED | INCONCLUSIVE | FLAG",
+  "claims": [
+    {"id": "C1", "text": "...", "expected": "...", "status": "PASS | FAIL | INCONCLUSIVE",
+     "evidence": ["evidence/c1-empty-title.http"], "notes": ""}
+  ],
+  "hack_flags": [],
+  "not_checked": ["claims or paths deliberately skipped, with why"],
+  "environment": {"launch": "<command>", "port": 0, "services": []}
+}
+```
+
+Overall verdict: **VERIFIED** only when every claim is PASS and there are no
+hack flags; **NOT VERIFIED** when any claim FAILs; **INCONCLUSIVE** when nothing
+failed but a claim could not be exercised; **FLAG** for any hack flag or a
+proposed oracle change.
+
+### 8. Cleanup
+Kill every process you started, by PID, and stop any containers you brought
+up. The `.verify/` directory survives cleanup; it is the deliverable.
+
+## Report
+
+End with the overall verdict, one line per claim (status, what was observed,
+evidence path), any hack flags, and the path to `report.json`. Report failures
+verbatim. The verdict comes from the evidence and nothing else.
 
 ## Maintaining this skill
-If you hit a blocker (the port discovery missed, a new framework boots
-differently, the health check pattern was wrong), fix it **and update this
-skill** so the next run doesn't trip on it.
+
+- When launch discovery took real work (non-obvious command, port, seed data,
+  auth fixture), write or update the target project's `.claude/verify-recipe.md`:
+  launch command, readiness URL, port, required services, test credentials, and
+  the 3–5 most important user-facing features. The next run starts from it.
+- When a run hits a blocker this skill didn't anticipate (a framework that boots
+  differently, a probe that gave a false PASS), fix it here so the next run
+  doesn't trip on it.
+
+## Known gaps
+
+The read-only oracle is a rule, not a mechanism: nothing yet blocks a verifier's
+Edit, Write or Bash from touching tests. Enforcing it needs a PreToolUse hook
+covering every write path, Bash included. Background:
+[verification-loop research](../../../docs/research/verification-loop-research.md).
