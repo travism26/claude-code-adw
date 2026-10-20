@@ -25,7 +25,7 @@ For every endpoint the diff touches, run the rows that apply:
 | GET after DELETE | 404 |
 | Read-only or privileged fields (`id`, `role`, `owner`) in a create/update body | Ignored; not echoed or stored |
 | Same request replayed (create, payment, any non-idempotent call) | Matches the API's stated idempotency rule |
-| **Every** non-2xx response | Consistent error shape for the project; no stack trace, file path or framework internals in the body |
+| **Every** non-2xx or error response | Consistent error shape for the project; no traceback, absolute file path or framework internals in the body |
 
 The last row is the most valuable single check: it catches leaked stack traces
 and inconsistent error handling across the whole surface at once.
