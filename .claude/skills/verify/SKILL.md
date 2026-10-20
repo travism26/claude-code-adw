@@ -17,9 +17,13 @@ For non-app deliverables (a script, an eval, a grader, a doc), use
 ## Author or verifier: pick your role first
 
 - **Author**: you wrote or changed the code in this context. You do not grade it.
-  Run step 1 yourself, then dispatch a fresh verifier subagent
-  (`general-purpose`) with the brief below and nothing else: no transcript, no
-  reasoning about why the code is right. Relay its report verbatim.
+  Run step 1 yourself, then dispatch the `verifier` subagent
+  (`.claude/agents/verifier.md`) with the brief below and nothing else: no
+  transcript, no reasoning about why the code is right. Relay its report
+  verbatim. Its guard hook blocks every write outside `.verify/`, so the oracle
+  stays read-only by mechanism, not by promise. Agent files load at session
+  start: if `verifier` is not available yet, dispatch `general-purpose` and mark
+  the report **unguarded**.
 - **Verifier**: you were dispatched with a brief, or you are checking a change
   you did not write. Run steps 1–8.
 
@@ -162,7 +166,11 @@ verbatim. The verdict comes from the evidence and nothing else.
 
 ## Known gaps
 
-The read-only oracle is a rule, not a mechanism: nothing yet blocks a verifier's
-Edit, Write or Bash from touching tests. Enforcing it needs a PreToolUse hook
-covering every write path, Bash included. Background:
+The `verifier` guard (`.claude/hooks/verify_guard.py`) covers Write, Edit,
+NotebookEdit and the ordinary shell write paths (redirects, `tee`, `rm`/`mv`/`cp`,
+`sed -i`, mutating git, inline interpreter code that writes files). It is a
+tripwire, not a sandbox: a script file or binary the verifier runs can still
+write anywhere. MCP tools are not guarded. The author's own writes are not
+guarded at all; protecting tests from the author is a separate problem.
+Background:
 [verification-loop research](../../../docs/research/verification-loop-research.md).
