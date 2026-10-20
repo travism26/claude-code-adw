@@ -36,3 +36,6 @@ evals/target_backend/uploads/
 
 # Screenshots written by the one-off review scripts under evals/target_frontend/
 evals/target_frontend/review_img/
+
+# Verify skill evidence bundles (written per run; kept local)
+.verify/
