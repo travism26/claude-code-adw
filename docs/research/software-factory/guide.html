@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Software factory research: visual guide</title>
+<style>
+:root {
+  --bg: #fbfbfa; --fg: #1d1f23; --muted: #5d636e; --card: #ffffff; --line: #d9dce1;
+  --accent: #2f5fd0; --accent-soft: #e6edfb;
+  --human: #b25e00; --human-soft: #fff1dd;
+  --gate: #b3261e; --gate-soft: #fde8e6;
+  --ok: #1d7a46; --ok-soft: #e1f4e8;
+  --code-bg: #eef0f3; --shadow: 0 1px 2px rgba(0,0,0,.06);
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15171b; --fg: #e4e6ea; --muted: #9aa1ad; --card: #1d2026; --line: #343841;
+    --accent: #7ea2ff; --accent-soft: #1f2a44;
+    --human: #ffb661; --human-soft: #3a2b16;
+    --gate: #ff8a80; --gate-soft: #3d1f1d;
+    --ok: #6fd39b; --ok-soft: #173325;
+    --code-bg: #262a31; --shadow: none;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 4.2rem; }
+body { margin: 0; background: var(--bg); color: var(--fg);
+  font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+a { color: var(--accent); }
+code, kbd { font: 0.88em/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  background: var(--code-bg); padding: 0.08em 0.35em; border-radius: 4px; }
+pre { background: var(--code-bg); padding: 0.8rem 1rem; border-radius: 8px; overflow-x: auto;
+  font: 0.85em/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; white-space: pre-wrap; }
+pre code { background: none; padding: 0; }
+h1 { font-size: 1.9rem; margin: 0 0 .3rem; line-height: 1.2; }
+h2 { font-size: 1.5rem; margin: 0 0 .8rem; padding-top: .4rem; border-bottom: 2px solid var(--line); padding-bottom: .3rem; }
+h3 { font-size: 1.15rem; margin: 1.6rem 0 .5rem; }
+h4 { font-size: 1rem; margin: 1rem 0 .4rem; }
+p, li { max-width: 78ch; }
+.muted { color: var(--muted); }
+.small { font-size: .88rem; }
+
+/* nav */
+nav.top { position: sticky; top: 0; z-index: 10; background: var(--bg);
+  border-bottom: 1px solid var(--line); box-shadow: var(--shadow); }
+nav.top ul { list-style: none; margin: 0 auto; padding: .45rem 1rem; display: flex; gap: .25rem;
+  overflow-x: auto; max-width: 1200px; white-space: nowrap; scrollbar-width: thin; }
+nav.top a { display: block; padding: .3rem .6rem; border-radius: 6px; text-decoration: none;
+  color: var(--muted); font-size: .86rem; }
+nav.top a:hover { background: var(--accent-soft); color: var(--fg); }
+nav.top a.active { background: var(--accent); color: #fff; }
+
+main { max-width: 1200px; margin: 0 auto; padding: 1.2rem 1rem 4rem; }
+section { margin: 2.6rem 0; }
+header.hero { padding: 1.4rem 0 .4rem; }
+
+.callout { border-left: 4px solid var(--accent); background: var(--accent-soft); padding: .7rem 1rem;
+  border-radius: 0 8px 8px 0; margin: 1rem 0; }
+.callout.warn { border-color: var(--gate); background: var(--gate-soft); }
+.callout.human { border-color: var(--human); background: var(--human-soft); }
+.callout.ok { border-color: var(--ok); background: var(--ok-soft); }
+.callout > :first-child { margin-top: 0; } .callout > :last-child { margin-bottom: 0; }
+
+.grid { display: grid; gap: .9rem; }
+.g2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .8rem 1rem; box-shadow: var(--shadow); }
+.card h4 { margin-top: 0; }
+.card > :last-child { margin-bottom: 0; }
+
+/* tables */
+.tablewrap { overflow-x: auto; margin: .8rem 0; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; background: var(--card); }
+th, td { border-bottom: 1px solid var(--line); padding: .5rem .6rem; text-align: left; vertical-align: top; }
+th { background: var(--code-bg); font-weight: 600; position: sticky; top: 0; }
+tr:last-child td { border-bottom: none; }
+td:first-child { font-weight: 600; }
+table.plain td:first-child { font-weight: normal; }
+
+/* flow diagrams */
+.legend { display: flex; flex-wrap: wrap; gap: .8rem; font-size: .85rem; margin: .4rem 0 1rem; }
+.legend span { display: inline-flex; align-items: center; gap: .35rem; }
+.sw { width: 14px; height: 14px; border-radius: 3px; border: 2px solid var(--line); display: inline-block; }
+.sw.h { border-color: var(--human); background: var(--human-soft); }
+.sw.g { border-color: var(--gate); background: var(--gate-soft); }
+.sw.c { border-color: var(--accent); background: var(--accent-soft); }
+
+.flow { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0; margin: .8rem 0 1.2rem; counter-reset: step; }
+.step { position: relative; flex: 1 1 210px; max-width: 290px; background: var(--card); border: 1px solid var(--line);
+  border-top: 4px solid var(--accent); border-radius: 8px; padding: .6rem .75rem .65rem; margin: 0 1.6rem .9rem 0;
+  font-size: .88rem; counter-increment: step; box-shadow: var(--shadow); }
+.step::before { content: counter(step); position: absolute; top: -.75rem; left: .6rem; background: var(--accent); color: #fff;
+  font-size: .72rem; font-weight: 700; border-radius: 999px; padding: 0 .45rem; line-height: 1.35rem; }
+.step::after { content: "\2192"; position: absolute; right: -1.35rem; top: 42%; color: var(--muted); font-size: 1.1rem; }
+.step:last-child::after { content: none; }
+.step.human { border-top-color: var(--human); background: var(--human-soft); }
+.step.human::before { background: var(--human); content: counter(step) " \00B7  YOU"; }
+.step .t { font-weight: 700; display: block; margin: .25rem 0 .3rem; }
+.step .cmd { display: block; margin: .25rem 0; }
+.step .cmd code { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.step .gate { display: block; margin-top: .4rem; padding: .3rem .45rem; background: var(--gate-soft); border-left: 3px solid var(--gate);
+  border-radius: 0 4px 4px 0; font-size: .82rem; }
+.step .gate::before { content: "Gate: "; font-weight: 700; color: var(--gate); }
+.step .note { display: block; margin-top: .35rem; color: var(--muted); font-size: .8rem; }
+.step.end { border-top-color: var(--ok); }
+.step.end::before { background: var(--ok); }
+
+/* pipeline stage strip */
+.stages { display: flex; flex-wrap: wrap; gap: .4rem; margin: .6rem 0; }
+.stages span { background: var(--accent-soft); border: 1px solid var(--accent); color: var(--fg); border-radius: 999px; padding: .15rem .65rem; font-size: .82rem; }
+
+svg text { fill: var(--fg); font-family: inherit; }
+svg .box { fill: var(--card); stroke: var(--accent); stroke-width: 1.5; }
+svg .box.h { fill: var(--human-soft); stroke: var(--human); }
+svg .edge { stroke: var(--muted); stroke-width: 1.6; fill: none; }
+svg .edge.back { stroke: var(--gate); stroke-dasharray: 5 4; }
+svg .edge.learn { stroke: var(--ok); stroke-dasharray: 3 4; }
+svg .lbl { font-size: 11px; fill: var(--muted); }
+svg .lbl.r { fill: var(--gate); } svg .lbl.g { fill: var(--ok); }
+svg .t1 { font-size: 14px; font-weight: 700; } svg .t2 { font-size: 10.5px; fill: var(--muted); }
+svg .axis { stroke: var(--line); stroke-width: 6; stroke-linecap: round; }
+.svgwrap { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: .6rem; margin: .8rem 0; overflow-x: auto; }
+.svgwrap svg { width: 100%; height: auto; min-width: 620px; display: block; }
+
+/* tiers */
+.tier { display: inline-block; font-weight: 700; padding: .05rem .45rem; border-radius: 5px; font-size: .82rem; }
+.t0 { background: var(--ok-soft); color: var(--ok); }
+.t1 { background: var(--accent-soft); color: var(--accent); }
+.t2 { background: var(--human-soft); color: var(--human); }
+.t3 { background: var(--gate-soft); color: var(--gate); }
+
+.pill { display: inline-block; font-size: .75rem; padding: 0 .45rem; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.pill.p { border-color: var(--accent); color: var(--accent); }
+.pill.m { border-color: var(--human); color: var(--human); }
+.pill.r { border-color: var(--ok); color: var(--ok); }
+
+details { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: .4rem .9rem; margin: .7rem 0; }
+details > summary { cursor: pointer; font-weight: 600; padding: .25rem 0; }
+details[open] > summary { margin-bottom: .4rem; border-bottom: 1px dashed var(--line); }
+
+.ladder { list-style: none; padding: 0; margin: .6rem 0; max-width: 640px; }
+.ladder li { display: flex; gap: .7rem; align-items: baseline; border: 1px solid var(--line); background: var(--card); border-radius: 6px; padding: .4rem .7rem; margin-bottom: .3rem; }
+.ladder li code { flex: 0 0 auto; min-width: 11.5em; }
+.ladder li.top { border-left: 5px solid var(--ok); }
+.ladder li.mid { border-left: 5px solid var(--accent); }
+.ladder li.weak { border-left: 5px solid var(--human); }
+.ladder li.bad { border-left: 5px solid var(--gate); }
+
+.srcs { font-size: .85rem; color: var(--muted); margin-top: .6rem; }
+.srcs a { margin-right: .5rem; }
+footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-top: 1rem; font-size: .85rem; color: var(--muted); }
+
+@media (max-width: 640px) {
+  .step { max-width: none; flex-basis: 100%; margin-right: 0; margin-bottom: 1.6rem; }
+  .step::after { content: "\2193"; right: auto; left: 50%; top: auto; bottom: -1.45rem; }
+  h1 { font-size: 1.5rem; }
+}
+@media print {
+  nav.top { display: none; }
+  body { background: #fff; color: #000; font-size: 11pt; }
+  main { max-width: none; padding: 0; }
+  section { break-inside: auto; margin: 1.2rem 0; }
+  h2 { break-before: page; }
+  section:first-of-type h2 { break-before: auto; }
+  .step, .card, tr, .ladder li { break-inside: avoid; }
+  .tablewrap, .svgwrap { overflow: visible; border: none; }
+  th { position: static; }
+  a { color: inherit; }
+  a[href$=".md"]::after { content: " (" attr(href) ")"; font-size: .8em; color: #555; }
+}
+</style>
+</head>
+<body>
+
+<nav class="top" aria-label="Sections">
+  <ul>
+    <li><a href="#big-picture">1 Big picture</a></li>
+    <li><a href="#pipeline">2 Pipeline</a></li>
+    <li><a href="#workflows">3 Workflows</a></li>
+    <li><a href="#compare">4 Compare</a></li>
+    <li><a href="#verification">5 Verification</a></li>
+    <li><a href="#tiers">6 Risk tiers</a></li>
+    <li><a href="#harness">7 Claude Code</a></li>
+    <li><a href="#cheatsheet">8 Which skill?</a></li>
+    <li><a href="#path">9 Your path</a></li>
+    <li><a href="#glossary">10 Glossary</a></li>
+  </ul>
+</nav>
+
+<main>
+<header class="hero">
+  <h1>Software factories: a visual guide</h1>
+  <p class="muted">A companion to the markdown research in this folder (2026-10-24), not a replacement for it. Each section links to the source <code>.md</code> files for depth. Start with <a href="README.md">README.md</a> and <a href="workflow-map.md">workflow-map.md</a> if you want the full text; work through the exercises with <a href="curriculum.md">curriculum.md</a>.</p>
+  <div class="legend" aria-label="Diagram legend">
+    <span><i class="sw c"></i> agent step</span>
+    <span><i class="sw h"></i> human touchpoint (YOU)</span>
+    <span><i class="sw g"></i> gate that can stop the flow</span>
+    <span><span class="pill p">/pstack:x</span> pstack skill</span>
+    <span><span class="pill m">/x</span> Matt Pocock skill</span>
+    <span><span class="pill r">/x</span> this repo's skill</span>
+  </div>
+</header>
+
+<!-- 1 -->
+<section id="big-picture">
+<h2>1. The big picture</h2>
+
+<div class="callout">
+<p><strong>A software factory is a pipeline where agents write the code <em>and</em> decide whether it merges.</strong> Humans own the intent (specs, scenarios), the harness, and the risk policy. Generating code is not the hard part. Trusting code nobody read is. Every serious practitioner lands on the same answer: <strong>verification by something other than the author, against an oracle the author cannot edit, producing evidence instead of claims.</strong></p>
+</div>
+
+<h3>The autonomy spectrum</h3>
+<div class="svgwrap">
+<svg viewBox="0 0 900 230" role="img" aria-label="Autonomy spectrum from Matt Pocock through Lauren Tan to StrongDM dark factory, with your destination covering Tan for low-risk tiers and Pocock for the rest">
+  <line class="axis" x1="60" y1="70" x2="840" y2="70"/>
+  <circle cx="90" cy="70" r="11" fill="var(--accent)"/>
+  <circle cx="450" cy="70" r="11" fill="var(--accent)"/>
+  <circle cx="810" cy="70" r="11" fill="var(--gate)"/>
+  <text x="90" y="40" text-anchor="middle" class="t1">Matt Pocock</text>
+  <text x="450" y="40" text-anchor="middle" class="t1">Lauren Tan (pstack)</text>
+  <text x="810" y="40" text-anchor="middle" class="t1">StrongDM "dark factory"</text>
+  <text x="90" y="100" text-anchor="middle" class="t2">human approves plan,</text>
+  <text x="90" y="114" text-anchor="middle" class="t2">reviews PR + QA;</text>
+  <text x="90" y="128" text-anchor="middle" class="t2">agents can't push</text>
+  <text x="450" y="100" text-anchor="middle" class="t2">human sets contract + risk policy;</text>
+  <text x="450" y="114" text-anchor="middle" class="t2">verifiers authorize reversible merges;</text>
+  <text x="450" y="128" text-anchor="middle" class="t2">human audits main next morning</text>
+  <text x="810" y="100" text-anchor="middle" class="t2">no human code, no human review;</text>
+  <text x="810" y="114" text-anchor="middle" class="t2">holdout scenarios + digital twins</text>
+  <text x="810" y="128" text-anchor="middle" class="t2">decide merges</text>
+  <rect x="60" y="150" width="440" height="34" rx="8" fill="var(--human-soft)" stroke="var(--human)" stroke-width="1.5"/>
+  <text x="280" y="172" text-anchor="middle" class="t1" style="font-size:13px">Your destination (R3): Pocock for most tiers, Tan for low-risk</text>
+  <line x1="660" y1="150" x2="840" y2="184" stroke="var(--gate)" stroke-width="2"/>
+  <line x1="660" y1="184" x2="840" y2="150" stroke="var(--gate)" stroke-width="2"/>
+  <text x="750" y="210" text-anchor="middle" class="lbl r">never a dark factory</text>
+</svg>
+</div>
+<p>You don't pick one point on this line. You pick it <strong>per risk tier</strong> (<a href="#tiers">section 6</a>). Everyone keeps humans on auth, billing, migrations and other one-way doors. HumanLayer turned review back on after an outage in code nobody had read for three months.</p>
+
+<div class="grid g3">
+  <div class="card"><h4>Matt Pocock: day shift / night shift</h4>
+  <p>The human grills, approves test seams and tickets, then QAs and merges. The AFK loop (<code>sandcastle</code>) runs sandboxed, can't push, and always ends in a PR. He treats a dark factory as a <em>failure mode</em>.</p></div>
+  <div class="card"><h4>Lauren Tan: trust before parallelism</h4>
+  <p>1–5 supervised agents until they can check their own work. A per-app verification skill is critical infrastructure. The overnight run is a contract. Only verified patches self-merge. She reviews <em>main</em> in the morning, not every PR.</p></div>
+  <div class="card"><h4>StrongDM: dark factory</h4>
+  <p>"Specs + scenarios drive agents that write code, run harnesses, and converge without human review." Holdout scenarios live outside the repo; digital twins stand in for third-party services.</p></div>
+</div>
+
+<div class="callout human">
+<p><strong>Your chosen destination (R3):</strong> Tan-style for low-risk tiers (verifiers merge, you audit main), Pocock-style (you merge) for everything else. Never a dark factory. Shapiro's level 3 to 4 jump is not about better models; it is about <strong>replacing your diff review with verification you trust more than your own skim of the diff</strong>.</p>
+</div>
+
+<details><summary>Shapiro's five levels (from the concept doc)</summary>
+<div class="tablewrap"><table>
+<tr><th>Level</th><th>Name</th><th>Human does</th></tr>
+<tr><td>0</td><td>Manual</td><td>Writes everything</td></tr>
+<tr><td>1</td><td>Assisted</td><td>Hands off discrete tasks (tests, docstrings)</td></tr>
+<tr><td>2</td><td>Pair</td><td>Works with the AI as a colleague ("90% of AI-native developers")</td></tr>
+<tr><td>3</td><td>Manager</td><td>Reviews diffs from several agent sessions ("almost everyone tops out here")</td></tr>
+<tr><td>4</td><td>PM</td><td>Writes specs and plans, leaves agents running, checks tests</td></tr>
+<tr><td>5</td><td>Dark factory</td><td>Specs in, software out, no human process in the middle</td></tr>
+</table></div>
+</details>
+<p class="srcs">Depth: <a href="concepts/software-factory-concept.md">concepts/software-factory-concept.md</a> <a href="README.md">README.md</a> <a href="decisions-to-grill.md">decisions-to-grill.md</a></p>
+</section>
+
+<!-- 2 -->
+<section id="pipeline">
+<h2>2. The shared stage pipeline</h2>
+<p>Every workflow in this research maps onto the same ten stages. They differ in who acts at each one and what evidence lets work pass.</p>
+
+<div class="svgwrap">
+<svg viewBox="0 0 820 330" role="img" aria-label="Ten-stage pipeline: Intake, Shape, Plan, Dispatch and Isolate, Build, then Verify, Review, Merge, Operate and Monitor, Learn, with feedback loops">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker>
+    <marker id="ahr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--gate)"/></marker>
+    <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--ok)"/></marker>
+  </defs>
+  <!-- row 1 -->
+  <rect class="box" x="20" y="30" width="130" height="62" rx="8"/><text x="85" y="56" text-anchor="middle" class="t1">Intake</text><text x="85" y="74" text-anchor="middle" class="t2">how work enters</text>
+  <rect class="box h" x="180" y="30" width="130" height="62" rx="8"/><text x="245" y="56" text-anchor="middle" class="t1">Shape</text><text x="245" y="74" text-anchor="middle" class="t2">spec: decides what</text>
+  <rect class="box" x="340" y="30" width="130" height="62" rx="8"/><text x="405" y="56" text-anchor="middle" class="t1">Plan</text><text x="405" y="74" text-anchor="middle" class="t2">units + order</text>
+  <rect class="box" x="500" y="30" width="130" height="62" rx="8"/><text x="565" y="52" text-anchor="middle" class="t1">Dispatch /</text><text x="565" y="68" text-anchor="middle" class="t1">Isolate</text><text x="565" y="84" text-anchor="middle" class="t2">workspace per agent</text>
+  <rect class="box" x="660" y="30" width="130" height="62" rx="8"/><text x="725" y="56" text-anchor="middle" class="t1">Build</text><text x="725" y="74" text-anchor="middle" class="t2">code + inner loop</text>
+  <!-- row 2 -->
+  <rect class="box" x="660" y="200" width="130" height="62" rx="8"/><text x="725" y="226" text-anchor="middle" class="t1">Verify</text><text x="725" y="244" text-anchor="middle" class="t2">run the real thing</text>
+  <rect class="box" x="500" y="200" width="130" height="62" rx="8"/><text x="565" y="226" text-anchor="middle" class="t1">Review</text><text x="565" y="244" text-anchor="middle" class="t2">read the diff</text>
+  <rect class="box h" x="340" y="200" width="130" height="62" rx="8"/><text x="405" y="226" text-anchor="middle" class="t1">Merge</text><text x="405" y="244" text-anchor="middle" class="t2">who lets it in</text>
+  <rect class="box" x="180" y="200" width="130" height="62" rx="8"/><text x="245" y="222" text-anchor="middle" class="t1">Operate /</text><text x="245" y="238" text-anchor="middle" class="t1">Monitor</text><text x="245" y="254" text-anchor="middle" class="t2">watch runs + prod</text>
+  <rect class="box h" x="20" y="200" width="130" height="62" rx="8"/><text x="85" y="226" text-anchor="middle" class="t1">Learn</text><text x="85" y="244" text-anchor="middle" class="t2">failures become checks</text>
+  <!-- forward -->
+  <path class="edge" d="M150,61 L178,61" marker-end="url(#ah)"/>
+  <path class="edge" d="M310,61 L338,61" marker-end="url(#ah)"/>
+  <path class="edge" d="M470,61 L498,61" marker-end="url(#ah)"/>
+  <path class="edge" d="M630,61 L658,61" marker-end="url(#ah)"/>
+  <path class="edge" d="M745,92 L745,198" marker-end="url(#ah)"/>
+  <path class="edge" d="M660,231 L632,231" marker-end="url(#ah)"/>
+  <path class="edge" d="M500,231 L472,231" marker-end="url(#ah)"/>
+  <path class="edge" d="M340,231 L312,231" marker-end="url(#ah)"/>
+  <path class="edge" d="M180,231 L152,231" marker-end="url(#ah)"/>
+  <!-- back edges -->
+  <path class="edge back" d="M705,200 L705,94" marker-end="url(#ahr)"/>
+  <text x="700" y="150" text-anchor="end" class="lbl r">fail</text>
+  <path class="edge back" d="M580,200 L668,94" marker-end="url(#ahr)"/>
+  <text x="612" y="168" class="lbl r">blocker</text>
+  <path class="edge back" d="M230,200 L100,94" marker-end="url(#ahr)"/>
+  <text x="120" y="150" class="lbl r">new tickets</text>
+  <path class="edge learn" d="M85,262 L85,300 L770,300 L770,264" marker-end="url(#ahg)"/>
+  <text x="430" y="318" text-anchor="middle" class="lbl g">checks, skills, lint, recipes, scenarios feed back into Build and Verify</text>
+  <text x="420" y="140" text-anchor="middle" class="lbl">Liveness: caps, stuck detection,</text><text x="420" y="155" text-anchor="middle" class="lbl">done predicate (Dispatch + Build)</text>
+</svg>
+</div>
+
+<div class="tablewrap"><table>
+<tr><th>Stage</th><th>Definition</th><th>Most distinctive mechanism</th></tr>
+<tr><td>Intake</td><td>Trigger, source, eligibility check</td><td>Poteto: Slack/Sentry automations + benny verdict marker. Pocock: triage labels, only <code>ready-for-agent</code> enters.</td></tr>
+<tr><td>Shape</td><td>Raw intent to spec with acceptance criteria</td><td>Pocock: grill, then spec with human-approved test seams. StrongDM: human-written specs and scenarios.</td></tr>
+<tr><td>Plan</td><td>Units and their order</td><td>Pocock: vertical-slice tickets with blocking edges. Poteto: brief template, refuse to spawn on a missing field.</td></tr>
+<tr><td>Dispatch/Isolate</td><td>One workspace per agent</td><td>Poteto: cloud VM per worker. Pocock: Docker sandbox, deterministic branch names.</td></tr>
+<tr><td>Build</td><td>Writing code, inner feedback loop</td><td>Pocock: TDD at agreed seams. Ralph: same prompt, one task per iteration.</td></tr>
+<tr><td>Verify</td><td>Checking it does what was asked, by running something</td><td>Poteto: per-app control CLI + feature map, live-lane swarm. StrongDM: holdouts vs digital twins.</td></tr>
+<tr><td>Review</td><td>Judging the diff by reading</td><td>Pocock: Standards + Spec axes, never merged. Poteto: one reviewer per model family.</td></tr>
+<tr><td>Merge</td><td>Who lets code into trunk, on what evidence</td><td>Poteto: self-merge only on a non-author verdict for this <code>patch-id</code>. Pocock: human merges.</td></tr>
+<tr><td>Operate/Monitor</td><td>Watching runs and prod; signals become work</td><td>Poteto: <code>watch-pr</code> verdicts, hourly audit, morning read of main.</td></tr>
+<tr><td>Learn</td><td>Failures become harness, skill, check or code changes</td><td>Poteto: <code>/correct</code>, lesson becomes lint. Pocock: <code>/retro</code>, mechanical lesson becomes a check.</td></tr>
+</table></div>
+<p class="srcs">Depth: <a href="workflow-map.md">workflow-map.md</a> sections 1–3</p>
+</section>
+
+<!-- 3 -->
+<section id="workflows">
+<h2>3. Each workflow, start to finish</h2>
+<p>Each card shows the step, the skill or command that fires, and the gate that can stop it. Orange cards are where <strong>you</strong> act. In Claude Code, pstack skills are invoked as <code>/pstack:&lt;name&gt;</code>; Matt Pocock's are unprefixed.</p>
+
+<h3 id="wf-day">3a. Lauren / pstack: daytime <code>/pstack:poteto-mode</code> (Bug fix playbook)</h3>
+<p class="muted small">The router matches the task to a playbook and copies its steps verbatim into a todo list. Role line: "You own this task. Plan, review, verify."</p>
+<div class="flow">
+  <div class="step human"><span class="t">Ask</span><span class="cmd"><code>/pstack:poteto-mode the sidebar flickers when…</code></span>Router picks <em>Bug fix</em>, copies steps to the todo list.<span class="gate">A skipped step stays in the list with <code>skip: &lt;reason&gt;</code></span></div>
+  <div class="step"><span class="t">Reproduce it yourself</span><span class="cmd">per-app <code>verify-&lt;app&gt;</code> control skill</span>Drive the matching surface.<span class="gate">May ask you only with a specific reason the surface can't reach the state</span></div>
+  <div class="step"><span class="t">Binary-search the cause</span><span class="cmd"><code>/pstack:how</code> <code>/pstack:why</code></span>Explorers + regression history. <code>/loop</code> for a stubborn hunt.<span class="gate">"Don't guess." After two failed fixes: attack the premise</span><span class="note">You steer by principle name.</span></div>
+  <div class="step"><span class="t">Plan the fix</span><span class="cmd"><code>/pstack:architect</code> (crosses a function boundary)</span>Delegate code to a <code>poteto-agent</code> on your bug-fix model.<span class="gate">Contested design: <code>/pstack:interrogate</code>. Product call: you.</span></div>
+  <div class="step"><span class="t">Verify on the same surface</span><span class="cmd">lead or a fresh verifier</span>The original repro now passes.<span class="gate">Inconclusive or wrong-surface is not a pass</span><span class="note">You sample the evidence (video, before/after), not the diff.</span></div>
+  <div class="step"><span class="t">Stage commits</span><span class="cmd"><code>/pstack:tdd</code> when a cheap test exists</span>Failing repro lands before the fix in history.</div>
+  <div class="step"><span class="t">Opening a PR</span><span class="cmd"><code>/deslop</code>* → <code>/pstack:no-comments</code> → <code>/pstack:interrogate</code></span>PR opened ready (never draft) with a briefing body: Why, What changed, Scope, Tradeoffs, Blast Radius, Verification.<span class="gate">Reviewer findings (Act on / Consider / Noted / Dismissed)</span></div>
+  <div class="step human"><span class="t">Decide landing + learn</span><span class="cmd">"babysit this" / "ship it" · <code>/pstack:reflect</code></span>Babysit or Shipping playbook, or nothing once self-merge is trusted for this class. End the session with reflect.<span class="gate">Skill edits are never auto-applied: you approve row by row</span></div>
+</div>
+<p class="small muted">* <code>/deslop</code> ships in Cursor's <code>cursor-team-kit</code> plugin, which is not installed here. <code>/pstack:unslop</code> covers prose only. Reply contract: "what was broken, root cause, fix, how you verified", with failing-then-passing output pasted verbatim.</p>
+<details><summary>Feature playbook instead of Bug fix</summary>
+<p>Role line "You own the design": <code>/pstack:how</code> → <code>/pstack:architect</code> → four-item throughput checkpoint → delegation through <code>/pstack:arena</code> when several shapes are valid ("Mandatory: no skip-with-reason escape") → verify on the matching surface → small ordered commits → <code>/pstack:interrogate</code> if contested → Opening a PR.</p>
+<p>Other playbooks the router can pick (they are files under <code>poteto-mode/playbooks/</code>, not separate commands): Autonomous run, Autopilot-full, Autopilot-stack, Orchestrate, Babysit, Shipping, Multi-phase plan, Pause safely, Session pickup, Perf issue, Refactoring, Investigation, Hillclimb, Eval, Prototype, Visual parity, and more.</p>
+</details>
+
+<h3 id="wf-night">3b. Lauren / pstack: the overnight bedtime contract</h3>
+<div class="flow">
+  <div class="step human"><span class="t">Write the contract (~22:30)</span><span class="cmd"><code>/pstack:poteto-mode im going to bed…</code></span>Goal, <strong>falsifiable done predicate</strong>, fresh worktree, "keep a decision log", "don't ask me before committing", <code>/loop until done</code>, escape hatch, and who lands it.<span class="gate">"A duration is not a finish condition"</span></div>
+  <div class="step"><span class="t">Frame (Phase A)</span><span class="cmd"><code>/pstack:figure-it-out</code></span>Router sends step-away work here even if Feature fits. States predicate, quantified scope, rigor "biased high".<span class="gate">No falsifiable predicate means not ready</span></div>
+  <div class="step"><span class="t">Design (Phase B)</span><span class="cmd"><code>/pstack:architect</code> for one-way doors only</span>Atomic, independently landable units, riskiest first. <strong>Build the verification harness first</strong>, with a pre-change baseline. The phase list is what you review.</div>
+  <div class="step"><span class="t">Iterate (Phase C)</span><span class="cmd"><code>/pstack:show-me-your-work</code> (decisions.tsv)</span>Smallest change → measure on the real artifact → commit if it advanced the predicate, revert if not. One log row per iteration.<span class="gate">VERIFIED / NOT VERIFIED / INCONCLUSIVE. "Inconclusive is not a pass."</span><span class="note">Questions: prototype, or apply a stated default. Irreversible writes still pause.</span></div>
+  <div class="step"><span class="t">Open PRs + verify</span><span class="cmd"><code>/pstack:swarm</code> verifiers</span>Small stacked PRs, ready. Fresh verifiers that never wrote the code.<span class="gate">No clean verdict without the live lane. A gap is not a pass.</span></div>
+  <div class="step"><span class="t">Hourly audit</span><span class="cmd"><code>/loop 1h</code></span>Re-read the playbook from trunk, probe every agent by side effects (pushes, trail rows), replace stuck agents. Quiet tick if nothing changed.</div>
+  <div class="step"><span class="t">Land (Autopilot-full only)</span><span class="cmd">Shipping playbook</span>Bottom-up, contiguous verified run, merge read back from the forge, one CI retry per flake.<span class="gate"><code>git patch-id</code> at verdict must match head. Green CI alone never merges.</span><span class="note">Autopilot-stack stops here: you land the stack.</span></div>
+  <div class="step human"><span class="t">Morning audit (~08:00)</span><span class="cmd"><code>/pstack:show-me-your-work catch me up…</code> → <code>/pstack:ketchup</code></span>Read the Attention section (written by a different model), then the calls waiting on you, then <strong>main's history</strong>.<span class="gate">You revert, or turn it into structure: <code>/pstack:correct</code>, <code>/pstack:reflect</code></span></div>
+</div>
+<details><summary>The canonical bedtime prompt, and the landing choice</summary>
+<pre><code>/pstack:poteto-mode im going to bed. build &lt;feature&gt; in a fresh worktree off main, as a stack of small PRs.
+done means &lt;falsifiable predicate: e.g. the new flow passes the feature-map sweep for X, all existing fixtures pass, old path deleted&gt;.
+keep a decision log. don't ask me before committing.
+/loop until done. if you're truly stuck after a few hours, stop and write up why.</code></pre>
+<ul>
+<li>"stack them, don't ship" → <strong>Autopilot-stack</strong> ("You own the stack, never the landing"). You land it in the morning.</li>
+<li>"i want them merged by morning" on independent items → <strong>Autopilot-full</strong> ("You own the verdicts, never the PRs").</li>
+<li>A multi-day program → <strong>Orchestrate</strong> ("i'll check in twice a day"), with <code>gates.md</code> entries that carry a "default on no answer".</li>
+</ul>
+<p><strong>Always pause:</strong> force-push to shared branches, deploys, data deletion, customer messages.</p>
+<p><strong>In Claude Code:</strong> <code>/loop</code> needs a live, idle session, so a truly unattended night needs <code>/schedule</code>, a GitHub Action, or a thin <code>claude -p</code> driver (<a href="#harness">section 7</a>).</p>
+</details>
+
+<h3 id="wf-benny">3c. Lauren: benny Slack bug report → draft PR (overnight)</h3>
+<p class="muted small">benny is a set of Cursor Automations. Steps 1–5 are fully defined in the benny pack; benny itself stops at a <em>draft</em> PR. How that draft becomes a self-merged PR (verify, babysit, ship) is her stated later behavior and is not in public files.</p>
+<div class="flow">
+  <div class="step"><span class="t">Intake</span><span class="cmd">automation <code>benny-triage</code></span>New top-level message in the feedback channel; thread coordinates frozen.<span class="gate">Fail closed: missing config, adapter, feature map or tracker = no writes</span></div>
+  <div class="step"><span class="t">Triage</span><span class="cmd">trace with <code>how</code> / <code>why</code></span>Classify, dedupe, ticket only if seven conditions hold. Posts exactly one marker: <code>[benny:bug]</code>, <code>[benny:performance]</code> or <code>[benny:other]</code>.<span class="gate"><code>other</code> ends the chain; confident duplicate gets a recurrence note</span></div>
+  <div class="step"><span class="t">Reproduce ×2</span><span class="cmd">automation <code>benny-reproduce</code> + media reviewer</span>Polls for the marker from the trusted identity. Drives the real UI via the control adapter.<span class="gate">Symptom must appear twice through real UI; media reviewer must see it; existing fix switches to verify mode</span></div>
+  <div class="step human"><span class="t">Veto window</span><span class="cmd"><code>rejection_window_minutes: 10</code></span>Anyone in the thread can reject the repro. At 01:10 nobody is awake: silence is consent.<span class="gate">A valid human rejection</span></div>
+  <div class="step end"><span class="t">Fix as a draft PR</span><span class="cmd"><code>tdd</code>, <code>unslop</code></span>Failing test first, smallest root-cause fix, patched build passes the same path twice, blast-radius smoke. Draft PR with repro, root cause, before/after.<span class="gate">Runtime evidence must name the root cause; fits <code>fix_minutes: 90</code>; never merge or deploy</span></div>
+  <div class="step human"><span class="t">Morning</span><span class="cmd">Slack thread + main</span>The thread holds the evidence chain, so you can check it fixed the right thing "before reading a line of code".</div>
+</div>
+<p class="small">Claude Code equivalent: a webhook or label trigger into a headless run, GitHub issue labels instead of thread markers, and deny hooks on subagent writes.</p>
+
+<h3 id="wf-matt">3d. Matt Pocock: grill → spec → tickets → implement → review → PR → human QA</h3>
+<div class="flow">
+  <div class="step"><span class="t">Setup (once per repo)</span><span class="cmd"><code>/setup-matt-pocock-skills</code></span>Writes tracker, triage-label and domain docs; adds the Agent skills block to CLAUDE.md.</div>
+  <div class="step"><span class="t">On-ramp (optional)</span><span class="cmd"><code>/triage</code> · <code>/diagnosing-bugs</code> · <code>/wayfinder</code></span>Label state machine; writes an agent brief with testable acceptance criteria.<span class="gate">A bug claim must be reproduced first</span></div>
+  <div class="step human"><span class="t">Grill</span><span class="cmd"><code>/grill-with-docs</code> (or <code>/grilling</code>, <code>/grill-me</code>)</span>Design tree; asks the whole frontier each round with a recommended answer. Writes GLOSSARY + ADRs. Facts are the agent's job, decisions are yours.<span class="gate">Ends only when the frontier is empty</span><span class="note">Runnable question? <code>/handoff</code> → <code>/prototype</code> → back.</span></div>
+  <div class="step human"><span class="t">Spec</span><span class="cmd"><code>/to-spec</code></span>Synthesizes the conversation (same context window). Problem, solution, user stories, decisions, testing decisions, out of scope.<span class="gate">You approve the test seams ("ideal number is one")</span></div>
+  <div class="step human"><span class="t">Tickets</span><span class="cmd"><code>/to-tickets</code></span>Tracer-bullet vertical slices, each sized to one fresh context, with blocking edges. Labelled <code>ready-for-agent</code>.<span class="gate">You approve granularity and edges</span><span class="note"><code>/clear</code> after this.</span></div>
+  <div class="step"><span class="t">Implement</span><span class="cmd"><code>/implement</code> per ticket, or <code>/implement-spec</code></span>Drives <code>/tdd</code> red-green at the agreed seams; typecheck + single tests often, full suite once. <code>/clear</code> between tickets.<span class="gate">Pre-commit hook: commits blocked unless everything passes</span></div>
+  <div class="step"><span class="t">Review</span><span class="cmd"><code>/code-review</code></span>Two parallel fresh agents: Standards and Spec, reported side by side.<span class="gate">"Do not merge or rerank findings"</span></div>
+  <div class="step"><span class="t">PR body</span><span class="cmd"><code>/pr</code></span>Summary (smallest visual), Evidence (screenshots S-tier, execution A-tier), Merge Danger (one-way / two-way door + blast radius).</div>
+  <div class="step human"><span class="t">QA, review, merge</span><span class="cmd">you</span>Tests first, then code, then QA the feature. QA "imposes taste" and becomes new tickets.<span class="gate">Only a human merges</span></div>
+  <div class="step"><span class="t">Retro</span><span class="cmd"><code>/retro</code> · <code>/improve-codebase-architecture</code></span>Fix the environment: a mechanical lesson "gets a deterministic check, full stop". Architecture upkeep every few days.</div>
+</div>
+
+<h3 id="wf-sandcastle">3e. Matt Pocock: the sandcastle AFK loop (night shift)</h3>
+<div class="flow">
+  <div class="step human"><span class="t">HITL first</span><span class="cmd"><code>ralph-once</code></span>Watch one iteration, tune the prompt "again and again" before going AFK.</div>
+  <div class="step"><span class="t">Pick work</span><span class="cmd">planner (Opus) emits <code>&lt;plan&gt;</code> JSON</span>Pulls live <code>gh issue list</code>; only <code>ready-for-agent</code> issues.<span class="gate">Issues touching overlapping files count as blocked</span></div>
+  <div class="step"><span class="t">Isolate</span><span class="cmd">Docker / Podman / Vercel microVM</span>One sandbox + branch per issue: <code>sandcastle/issue-{id}</code>, so re-planning resumes. <code>MAX_PARALLEL = 4</code>.</div>
+  <div class="step"><span class="t">Build</span><span class="cmd">implement prompt (RGR)</span>Explore, plan, red-green, <code>npm run typecheck</code> + <code>test</code>, commit with <code>RALPH:</code> prefix.<span class="gate">Blocked: comment on the issue and move on, never close it</span></div>
+  <div class="step"><span class="t">Review</span><span class="cmd">per-branch reviewer (often a different model)</span>Fresh context improves the branch; merger agent combines.</div>
+  <div class="step"><span class="t">Stop</span><span class="cmd">caps + signals</span>Hard iteration cap; <code>&lt;promise&gt;COMPLETE&lt;/promise&gt;</code>; empty frontier; idle timeout; 60 s post-signal grace.<span class="gate">The completion signal is a prompt convention, unchecked by the engine</span></div>
+  <div class="step human end"><span class="t">Reviewable PR</span><span class="cmd">you</span>Agents are told "Do not push / close / label". AFK defers all review to the end.<span class="gate">Human QA + review + merge</span></div>
+</div>
+
+<h3 id="wf-other">3f. StrongDM and Ralph, briefly</h3>
+<div class="grid g2">
+<div class="card"><h4>StrongDM AI Software Factory</h4>
+<div class="flow" style="margin:0">
+  <div class="step human" style="flex-basis:100%;max-width:none;margin-right:0"><span class="t">Humans write specs, scenarios, digital twins, harness</span>No hand-written code, no code review.</div>
+  <div class="step" style="flex-basis:100%;max-width:none;margin-right:0"><span class="t">Agents write code from a "seed"</span>A few sentences, a screenshot, or an existing codebase.</div>
+  <div class="step" style="flex-basis:100%;max-width:none;margin-right:0"><span class="t">Holdout scenarios vs the Digital Twin Universe</span>Scenarios live <em>outside</em> the repo so agents can't rewrite tests to match code.<span class="gate">Probabilistic satisfaction score (itself an AI judge)</span></div>
+  <div class="step end" style="flex-basis:100%;max-width:none;margin-right:0"><span class="t">Converges without human review</span>A sample of output is fed back into the inputs. Reported cost: at least $1,000 of tokens per engineer-day.</div>
+</div></div>
+<div class="card"><h4>Ralph (Geoffrey Huntley)</h4>
+<pre><code>while :; do cat PROMPT.md | claude-code ; done</code></pre>
+<ul class="small">
+<li>Specs in <code>specs/</code>, <code>fix_plan.md</code> as the queue. The agent picks the next item; a human edits the file to steer.</li>
+<li>Same prompt every iteration, one task per iteration. "The prompt never changes. The code does."</li>
+<li>"Backpressure": tests, type checker, static analysis, scanners.</li>
+<li>Done is self-declared (<code>&lt;promise&gt;</code> tag, nothing verifies it). Fine when the compiler is the oracle or a human reviews everything after.</li>
+<li>The baseline everyone else reacts to; its successors added review.</li>
+</ul></div>
+</div>
+<p class="srcs">Depth: <a href="workflows/poteto/how-she-develops.md">how-she-develops.md</a> <a href="workflows/poteto/pstack-mechanics.md">pstack-mechanics.md</a> <a href="workflows/poteto/cursor-native-pieces.md">cursor-native-pieces.md</a> <a href="workflows/poteto/public-workflow.md">public-workflow.md</a> <a href="workflows/poteto/repos-and-evolution.md">repos-and-evolution.md</a> <a href="dissections/poteto/overnight-contract.md">overnight-contract.md</a> <a href="workflows/matt-pocock/overview.md">matt-pocock/overview.md</a> <a href="workflows/adw/overview.md">adw/overview.md</a> <span class="muted">(ADW: dated reference only)</span></p>
+</section>
+
+<!-- 4 -->
+<section id="compare">
+<h2>4. Side by side</h2>
+<div class="tablewrap"><table>
+<tr><th>Stage</th><th>Poteto (pstack + Cursor)</th><th>Pocock (skills + sandcastle)</th><th>StrongDM</th><th>Ralph</th></tr>
+<tr><td>Intake</td><td>Automations watch Slack/Sentry/Linear; benny posts one marker from a fixed identity; overnight = one contract prompt</td><td><code>/triage</code> labels; bug reproduced first; only <code>ready-for-agent</code> enters</td><td>A "seed"</td><td>Specs + <code>fix_plan.md</code></td></tr>
+<tr><td>Shape</td><td>Cause traced with how/why; empirical forks settled by prototype; phase list is the artifact</td><td>Grill → prototype → spec with human-approved seams, one context window</td><td>Humans write specs + scenarios</td><td>Long human conversation</td></tr>
+<tr><td>Plan</td><td>Playbook steps to todo list; brief with refuse-to-spawn on missing field; <code>architect</code></td><td>Vertical-slice tickets with blocking edges, human approved</td><td>not documented</td><td>Agent picks from <code>fix_plan.md</code></td></tr>
+<tr><td>Isolate</td><td>Cloud VM per agent (~10 rolling); one writer per branch</td><td>Docker sandbox; <code>sandcastle/issue-{id}</code>; 4 parallel</td><td>not documented</td><td>None</td></tr>
+<tr><td>Build</td><td>"Smallest change the evidence justifies"; revert "might help" changes</td><td>TDD at agreed seams; <code>RALPH:</code> commits</td><td>Agents only</td><td>One task per iteration</td></tr>
+<tr><td>Verify</td><td>Per-app control CLI + feature map; swarm with mandatory live lane</td><td>Types, tests, pre-commit hook. No run-the-app verifier: human QA</td><td>Holdouts vs digital twins; satisfaction score</td><td>Backpressure</td></tr>
+<tr><td>Review</td><td><code>interrogate</code>: one reviewer per model family</td><td><code>/code-review</code>: Standards + Spec, never merged</td><td>None by humans</td><td>—</td></tr>
+<tr><td>Merge</td><td>Owner self-merges on a non-author verdict for this patch-id, bottom-up, read back</td><td>Human, after review</td><td>Without human review</td><td>not documented</td></tr>
+<tr><td>Learn</td><td><code>/reflect</code> (approved), <code>/correct</code>, daily verification-skill maintenance</td><td><code>/retro</code>; architecture upkeep</td><td>Output sampling</td><td>Human edits the plan</td></tr>
+<tr><td>Human gates</td><td>Contract; irreversible writes pause; gates.md defaults; veto window; morning audit</td><td>Grill, seams, ticket approval; HITL first; QA + review + merge</td><td>Specs, scenarios, twins</td><td>Specs, steering edits</td></tr>
+<tr><td>Liveness</td><td><code>/loop</code> wake; hourly audit; watchdog (30 min stuck)</td><td>Iteration cap, completion signal, empty frontier, idle timeout</td><td>not documented</td><td>Infinite loop</td></tr>
+</table></div>
+<p class="small muted">The full matrix also has Anthropic's harness posts and ADW columns, plus Memory, Models and Cost rows: <a href="workflow-map.md">workflow-map.md</a> section 2.</p>
+
+<h3>Where they conflict</h3>
+<div class="grid g2">
+<div class="card"><h4>Human at merge vs self-merge</h4><p>Pocock and ADW: human. Poteto (Autopilot-full) and StrongDM: agent. <strong>Self-merge fits</strong> a trusted verifier, reversible changes, cheap revert. <strong>Human merge fits</strong> one-way doors and thin test suites. Resolved per risk tier.</p></div>
+<div class="card"><h4>TDD required vs not</h4><p>Pocock's skills require it (though he has since moved away from requiring it). Poteto uses it when the test is cheap. StrongDM moves the oracle out of the repo. TDD pays where seams are clean; a run-the-app verifier catches more where the risk is wiring or startup.</p></div>
+<div class="card"><h4>Memory vault vs codebase-as-memory</h4><p>Poteto dropped her vault: "your codebase is the ultimate form of memory". Lessons become lint, types and skills. Check whether a note could be a check first.</p></div>
+<div class="card"><h4>Rubric axes vs model diversity</h4><p>Pocock: two axes. pstack: "adversarial signal comes from model diversity, not personas". Orthogonal, so use both; in Claude Code diversity collapses to Opus vs Sonnet.</p></div>
+<div class="card"><h4>Self-declared done vs independent verifier</h4><p>Ralph and sandcastle trust a promise tag. pstack, Anthropic and StrongDM do not. Once no human reads the diff, the done signal must come from something the author cannot write.</p></div>
+<div class="card"><h4>Resolve ambiguity before vs during</h4><p>Pocock grills until the frontier is empty ("coherent about the wrong thing" is the AFK failure). pstack settles empirical forks by prototype mid-run and parks the rest with defaults.</p></div>
+<div class="card"><h4>Who picks the next task</h4><p>The agent (Ralph), a planner agent (sandcastle), a script over a dependency graph (orchestrate), or a human (ADW). A deterministic frontier suits parallel work.</p></div>
+<div class="card"><h4>Worktrees vs sandboxes vs cloud VMs; draft vs ready PRs; auto vs approved learning</h4><p>Worktrees are cheapest but share credentials. Containers add an egress boundary; VMs survive a closed laptop. Draft PRs suit human-merge; ready-plus-verdict suits verifier-gated merge. Anything that changes future agents' behavior needs approval or an eval.</p></div>
+</div>
+
+<h3>Where they all agree</h3>
+<ol class="grid g2" style="list-style-position:inside;padding:0">
+<li class="card">The writer never grades itself.</li>
+<li class="card">Verification is the bottleneck, not generation.</li>
+<li class="card">Run the real thing.</li>
+<li class="card">State lives on disk and in git, not in the chat.</li>
+<li class="card">One unit of work per fresh context.</li>
+<li class="card">Deterministic work goes in code; judgment goes to the model.</li>
+<li class="card">Encode lessons as structure ("the instruction is the symptom").</li>
+<li class="card">Hard stops exist. "A duration is not a finish condition."</li>
+<li class="card">Irreversible actions stay human.</li>
+<li class="card">Earn trust before scaling out.</li>
+<li class="card">Humans keep the spec and the risk policy.</li>
+</ol>
+<p class="srcs">Depth: <a href="workflow-map.md">workflow-map.md</a> sections 4–5</p>
+</section>
+
+<!-- 5 -->
+<section id="verification">
+<h2>5. Verification deep dive</h2>
+
+<h3>The vocabulary (settled in R6; "validation" is retired)</h3>
+<div class="grid g3">
+<div class="card"><h4>Check</h4><p>A deterministic gate (types, lint, tests, static analysis) whose pass/fail the implementing agent cannot edit.</p></div>
+<div class="card"><h4>Verification</h4><p>An agent that did not write the change <strong>runs the real application</strong> against claims fixed before the run and records evidence.</p></div>
+<div class="card"><h4>Claim</h4><p>One observable statement about the running app with an <strong>explicit expected observation</strong>, fixed before verification starts.</p></div>
+<div class="card"><h4>Verdict</h4><p>The outcome of one verification, <strong>bound to the exact code it judged</strong>, with evidence attached.</p></div>
+<div class="card"><h4>Review</h4><p>An agent or human <strong>reads</strong> the diff for quality and fit to the spec, without running the app.</p></div>
+</div>
+
+<h3>Author vs Verifier</h3>
+<div class="svgwrap">
+<svg viewBox="0 0 860 210" role="img" aria-label="Author writes code; claims are fixed before the run from the ticket; verifier runs the app read-only and writes the verdict bound to patch-id; ship gate reads the verdict">
+  <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+  <rect class="box" x="15" y="30" width="170" height="70" rx="8"/><text x="100" y="58" text-anchor="middle" class="t1">Author</text><text x="100" y="78" text-anchor="middle" class="t2">writes the change</text>
+  <rect class="box h" x="15" y="125" width="170" height="70" rx="8"/><text x="100" y="153" text-anchor="middle" class="t1">Ticket / feature map</text><text x="100" y="173" text-anchor="middle" class="t2">acceptance criteria</text>
+  <rect class="box" x="240" y="78" width="170" height="70" rx="8"/><text x="325" y="106" text-anchor="middle" class="t1">Claims, fixed</text><text x="325" y="126" text-anchor="middle" class="t2">before the run</text>
+  <rect class="box" x="465" y="78" width="170" height="70" rx="8" style="stroke:var(--ok);stroke-width:2.5"/><text x="550" y="106" text-anchor="middle" class="t1">Verifier</text><text x="550" y="126" text-anchor="middle" class="t2">fresh, read-only (guard)</text>
+  <rect class="box" x="690" y="78" width="155" height="70" rx="8"/><text x="767" y="100" text-anchor="middle" class="t1">Verdict</text><text x="767" y="118" text-anchor="middle" class="t2">+ evidence on disk</text><text x="767" y="134" text-anchor="middle" class="t2">bound to patch-id</text>
+  <path class="edge" d="M185,65 L238,100" marker-end="url(#ah2)"/><text x="200" y="66" class="lbl">diff + SHA</text>
+  <path class="edge" d="M185,160 L238,128" marker-end="url(#ah2)"/><text x="196" y="170" class="lbl">verifier derives</text>
+  <path class="edge" d="M410,113 L463,113" marker-end="url(#ah2)"/>
+  <path class="edge" d="M635,113 L688,113" marker-end="url(#ah2)"/>
+  <text x="550" y="40" text-anchor="middle" class="lbl r">never sees the author's transcript; cannot edit code or claims</text>
+  <text x="550" y="185" text-anchor="middle" class="lbl">adds at least one regression claim the author didn't name</text>
+</svg>
+</div>
+<div class="callout ok"><p><strong>Where this repo already leads:</strong> <code>verify</code> is the only skill of the three that makes the oracle read-only <em>by mechanism</em> (a fail-closed PreToolUse guard on the <code>verifier</code> agent), not by instruction. pstack enforces nothing mechanically; Pocock has no run-the-app verifier at all.</p></div>
+<div class="callout warn">
+<p><strong>The gaps (prioritized in the skills comparison):</strong></p>
+<ol>
+<li><code>ship-gate</code> never reads the verify verdict, so a branch can ship with no report or a FAIL.</li>
+<li>The author writes the claims. The one real run passed "GET /health answers" while the body said <code>"status": "unhealthy"</code>. Vague expectations should make a run INCONCLUSIVE.</li>
+<li>No project recipe: every run rediscovers launch, port and seed data.</li>
+<li>Nothing proves the verifier can fail (no parent-SHA "must fail" run, no planted failure).</li>
+<li>The running app must match the commit under test; degraded dependencies mean INCONCLUSIVE, not PASS.</li>
+</ol></div>
+
+<h3>The verification ladder</h3>
+<p>Not all "verified" is equal. The orchestrate plugin stores the strongest rung the evidence supports on the <em>target</em> task, overriding the worker's self-report. pstack's ledger uses the same values.</p>
+<ul class="ladder">
+<li class="top"><code>live-ui-verified</code><span>Reproduced live (real browser, binary or CLI); the fix removes it. Trust as shipped.</span></li>
+<li class="mid"><code>unit-test-verified</code><span>A targeted test exercises the changed path. OK for non-UI; UI bugs want a live pass later.</span></li>
+<li class="weak"><code>type-check-only</code><span>Only build or type-check passed. Weak; only for typing-only changes.</span></li>
+<li class="bad"><code>verifier-blocked</code><span>Environment failure prevented the check. "Don't count as verified." Respawn when healthy.</span></li>
+<li class="bad"><code>verifier-failed</code><span>Ran it; the fix did not work. Follow-up fix task.</span></li>
+<li class="bad"><code>not-verified</code><span>Self-report only.</span></li>
+</ul>
+<p class="small">Anti-laundering rule: "Don't report <code>type-check-only</code> for a check you didn't run end-to-end; that disguises an env failure." pstack per-run verdicts: VERIFIED / NOT VERIFIED / INCONCLUSIVE, and "inconclusive is not a pass". <code>/pstack:blast-radius</code> has its own five-step proof ladder that ends at "you ran it" and "you reproduced it in the running app".</p>
+<details><summary>The proof bar (what counts as evidence)</summary>
+<ol class="small">
+<li>Real user path, not internal setters or test-only endpoints. No "look, it opens" captures.</li>
+<li>Capture the action and the resulting state in the same recording.</li>
+<li>Side effects read back (files written, rows inserted) through a second, read-only view.</li>
+<li>Mocks only behind an existing production boundary.</li>
+<li>Dry-run is observed, not trusted: some dry-runs still touch the network.</li>
+<li>Fresh build: "a video against a stale bundle is not evidence".</li>
+<li>The coverage set is the feature file: every entry point, mode, success / cancel / error / empty / persistence path the change can affect.</li>
+<li>Per-surface minimums: UI = ARIA snapshot + screenshot with app identity; CLI = command, stdout, stderr, exit code.</li>
+<li>Honest skips: report the attempted command and unmet precondition; never claim a skipped path via another one.</li>
+</ol></details>
+
+<h3>The recipe generator idea: protocol vs recipe</h3>
+<div class="grid g2">
+<div class="card"><h4><code>verify</code> = the protocol (keep)</h4><p>Who grades, what is read-only (the guard), the claim rules, the report schema, verdict rules. Generic across every stack.</p></div>
+<div class="card"><h4><code>verify-&lt;app&gt;</code> = the recipe (generate per repo)</h4><p>How to <strong>Launch, Doctor, Drive, Evidence, Cleanup</strong> <em>this</em> app, plus a <code>features/</code> map. Generated by pstack's <code>/pstack:create-verification-skill</code> (or a proposed <code>create-verify-recipe</code>), proven once end to end before it counts, kept honest by <code>/pstack:maintain-verification-skill</code>.</p></div>
+</div>
+<details><summary>Proposed <code>create-verify-recipe</code> output (target repo, committed)</summary>
+<pre><code>.claude/skills/verify-&lt;app&gt;/
+  SKILL.md      # Launch, Doctor, Drive, Evidence, Cleanup, Helpers, Feature map
+  recipe.json   # machine-readable subset read by verify and pipelines
+  bin/          # launch, doctor, cleanup (+ optional ctl)
+  probes/       # Hurl / Playwright / CLI drive scripts per feature (read-only to authors)
+  features/
+    README.md   # baseline preconditions, conventions, proof + skip rules, status table
+    &lt;feature&gt;.md</code></pre>
+<p class="small">The generator is an <em>author</em>; its proof run is a <em>verifier</em> dispatch, so the read-only guard needs no change. Maintenance outcomes: <code>clean</code> (no PR), <code>changed</code> (one PR of proven map/harness fixes), or <code>blocked</code>. "A feature map rots the moment the app changes." Never edits product code.</p>
+</details>
+
+<h3>Binding a verdict to the code: <code>git patch-id</code></h3>
+<pre><code>base=$(git merge-base origin/main HEAD)        # stacked PR: the parent branch tip
+git diff --binary "$base" HEAD | git patch-id --verbatim | cut -d' ' -f1</code></pre>
+<div class="grid g2">
+<div class="card"><h4>Keeps the verdict</h4><ul class="small">
+<li>Rebase over unrelated trunk commits</li>
+<li>Trunk touched the same file outside the 3-line context</li>
+<li>Squashing, re-splitting or rewording commits</li>
+<li>Clean retarget of a stacked child after its parent merged</li></ul></div>
+<div class="card"><h4>Invalidates the verdict</h4><ul class="small">
+<li>Any change to an added or removed line</li>
+<li>Any new or deleted file in the PR</li>
+<li>Trunk changing a line inside the patch's context window</li>
+<li>Conflict resolution; whitespace change under <code>--verbatim</code></li></ul></div>
+</div>
+<div class="callout warn">
+<p><strong>The <code>--verbatim</code> finding.</strong> The default and <code>--stable</code> modes ignore whitespace. In Python, moving <code>return 3</code> into an <code>if</code> block changes behavior, yet both versions hash the same under <code>--stable</code> and differently under <code>--verbatim</code>. pstack's Shipping playbook names no mode. <strong>Use <code>--verbatim</code> everywhere</strong> (YAML, Python, Makefiles, <code>application.yml</code>) as one rule. An empty diff gives an empty ID, so the check must fail closed.</p>
+<p><strong>What patch-id cannot see:</strong> trunk changing code the patch <em>calls</em> in another file. Same ID, different behavior. Autopilot-full re-runs the patch's checks on the merge result in that case. Patch-id is necessary for carrying a verdict, not sufficient.</p>
+</div>
+<p class="srcs">Depth: <a href="verification/skills-comparison.md">verification/skills-comparison.md</a> <a href="dissections/poteto/verification-skill-generator.md">verification-skill-generator.md</a> <a href="dissections/poteto/shipping-merge-authority.md">shipping-merge-authority.md</a> <a href="dissections/poteto/orchestrate-reconcile-loop.md">orchestrate-reconcile-loop.md</a> <a href="GLOSSARY.md">GLOSSARY.md</a> <a href="../verification-loop-research.md">../verification-loop-research.md</a></p>
+</section>
+
+<!-- 6 -->
+<section id="tiers">
+<h2>6. Risk tiers T0–T3</h2>
+<p>A proposal from the risk-tiered-merge dissection. The tier is the <strong>maximum</strong> over all signals. Detection is deterministic (path globs, line counts, regexes over the diff). An optional LLM pass may only <strong>raise</strong> a tier, never lower it.</p>
+<div class="tablewrap"><table>
+<tr><th>Tier</th><th>Detects</th><th>Required evidence</th><th>Who merges</th><th>Rollback</th></tr>
+<tr><td><span class="tier t0">T0</span> Inert</td><td>Docs/<code>*.md</code> (not CLAUDE.md, SKILL.md, <code>.claude/**</code>), comment-only diffs, <strong>added-only</strong> tests. ≤200 lines. No modified assertions.</td><td>Checks green on HEAD; review has no P0/P1.</td><td>Harness auto-merges and reads back (shadow first).</td><td>Agent <code>git revert</code></td></tr>
+<tr><td><span class="tier t1">T1</span> Reversible internal</td><td>Production code in non-sensitive paths. ≤400 lines, ≤15 files. No deps, config, schema or public API change.</td><td>T0 + VERIFIED verdict whose patch-id equals HEAD + non-author reviewer with no blockers + "two-way door".</td><td>Auto-merge <strong>after a shadow period</strong>; human one-click until then.</td><td>Agent opens a revert PR</td></tr>
+<tr><td><span class="tier t2">T2</span> Contract or wiring</td><td>Dependency/manifest/lockfile, config, feature-flag defaults, public API, concurrency semantics, &gt;400 lines, or any missing classifier input.</td><td>T1 + blast-radius writeup with the safety fact proven by a run + dependency diff summary.</td><td><strong>Human</strong> approves.</td><td>Revert PR</td></tr>
+<tr><td><span class="tier t3">T3</span> One-way door</td><td>Migrations, authn/authz, billing, <code>unsafe</code>/FFI, infra/deploy, CI and harness files, the tier policy itself, secrets, data deletion, external messages.</td><td>T2 + written rollback/forward-fix plan; migrations rehearsed on a prod-like snapshot; "one-way door" stated.</td><td><strong>Human</strong>, enforced by CODEOWNERS. The agent may never approve.</td><td>Pre-declared plan only</td></tr>
+</table></div>
+<p class="small">Notes: thresholds are proposals to calibrate in shadow mode. Edits that delete or loosen test assertions are at least T1 and trigger a hack check. A feature flag is T1 only if its default is unchanged. Per R3, T0/T1 is where Tan-style merging could eventually apply; T2/T3 stay Pocock-style.</p>
+<p class="srcs">Depth: <a href="dissections/industry/risk-tiered-merge.md">dissections/industry/risk-tiered-merge.md</a> (sections 7–8 have Spring, Rust and Node high-risk paths)</p>
+</section>
+
+<!-- 7 -->
+<section id="harness">
+<h2>7. Claude Code as the harness</h2>
+<div class="callout ok"><p><strong>Supervised daytime work fits entirely inside Claude Code:</strong> a coordinator session, nested subagents up to 3 deep, custom read-only verifier agents (tools restricted, <code>agent_type</code> visible to guard hooks), worktree isolation, and saved workflows for fan-out. A personal plugin can package all of it (R8).</p></div>
+<div class="tablewrap"><table>
+<tr><th>Capability</th><th>How</th><th>Limit that matters</th></tr>
+<tr><td>Subagent nesting</td><td>3 layers below main by default</td><td>At the limit the Agent tool is withheld</td></tr>
+<tr><td>Custom agent restrictions</td><td><code>.claude/agents/*.md</code>: <code>tools</code>, <code>disallowedTools</code>, <code>model</code>, <code>maxTurns</code>, <code>isolation</code>, <code>hooks</code></td><td><code>permissionMode</code> ignored for plugin agents; parent bypass overrides it</td></tr>
+<tr><td>PreToolUse blocking</td><td>Exit 2 or <code>permissionDecision: deny</code></td><td>PostToolUse can't undo a tool that already ran</td></tr>
+<tr><td>Stop / SubagentStop continuation</td><td>Exit 2 or <code>decision: "block"</code></td><td>Overridden after 8 consecutive blocks</td></tr>
+<tr><td>Worktrees</td><td><code>claude -w</code>; subagent <code>isolation: worktree</code></td><td>Auto-removed only if unchanged; <code>-p</code> runs don't clean up</td></tr>
+<tr><td>Workflow scripts</td><td><code>agent()</code>, <code>parallel()</code>, <code>pipeline()</code> under <code>.claude/workflows/</code></td><td>No mid-run user input; no shell from the script</td></tr>
+<tr><td><code>/loop</code></td><td>Interval or self-paced in an open session</td><td>Session must be open and idle; 7-day expiry</td></tr>
+<tr><td><code>/schedule</code> cloud tasks</td><td>Cron (min 1 h), API, GitHub events</td><td>Research preview; pushes to <code>claude/</code> branches</td></tr>
+<tr><td><code>/goal</code></td><td>Condition re-judged each turn by a small model</td><td>Evaluator has <strong>no tools</strong>, reads only the transcript: it can't be the gate</td></tr>
+<tr><td>Headless caps</td><td><code>--max-budget-usd</code>; <code>--max-turns</code></td><td><code>--max-turns</code> missing from local <code>--help</code> 2.1.310; agent <code>maxTurns</code> is the alternative</td></tr>
+<tr><td>Agent teams</td><td>Experimental flag; peers via SendMessage</td><td>Interactive only; no nesting; not restored on resume</td></tr>
+<tr><td>GitHub Actions</td><td><code>anthropics/claude-code-action@v1</code> on any event or cron</td><td>CI minutes plus a key or OAuth token</td></tr>
+<tr><td>Cloud sessions</td><td><code>claude --cloud</code>, <code>--teleport</code></td><td>Background shells, subagents and loops lost on environment expiry</td></tr>
+</table></div>
+<div class="callout warn">
+<p><strong>Overnight is where the gaps are.</strong> <code>/loop</code> needs a live session; <code>/goal</code> can't run checks; Stop-hook continuation caps at 8; agent teams don't run headless. Unattended options: <code>/schedule</code>, a GitHub Action, or a thin local <code>claude -p</code> loop with a budget cap (R10 defers this until after the pilot).</p>
+<p><strong>The verdict-outside-the-agent rule still needs one deterministic component the agent can't influence:</strong> a Stop/SubagentStop hook that runs the checks, an Action, or the thin driver. Not a whole harness.</p>
+<p><strong>Model diversity collapses:</strong> in Claude Code, "different family" verification means Opus vs Sonnet unless you bridge to another vendor (R5 keeps it Claude-only for now).</p>
+</div>
+<p class="srcs">Depth: <a href="concepts/claude-code-as-harness.md">concepts/claude-code-as-harness.md</a></p>
+</section>
+
+<!-- 8 -->
+<section id="cheatsheet">
+<h2>8. Which skill do I use when?</h2>
+<p class="small">Names checked against the installed pstack 0.15.28 skills and <code>~/.claude/skills/</code>. pstack skills take the <code>/pstack:</code> prefix in Claude Code; Matt's skills are unprefixed; <span class="pill r">repo</span> marks this repo's own skills.</p>
+<div class="tablewrap"><table class="plain">
+<tr><th>Situation</th><th>Command</th><th>Notes</th></tr>
+<tr><td colspan="3"><strong>Setup</strong></td></tr>
+<tr><td>New repo: tracker, labels, glossary/ADR layout</td><td><code>/setup-matt-pocock-skills</code></td><td>Once per repo</td></tr>
+<tr><td>Configure pstack's model per role</td><td><code>/pstack:setup-pstack</code></td><td>Already done (R12)</td></tr>
+<tr><td>Build a per-app verification skill (control CLI + feature map)</td><td><code>/pstack:create-verification-skill</code></td><td>Pilot exercise 1</td></tr>
+<tr><td>Keep the feature map honest</td><td><code>/pstack:maintain-verification-skill</code></td><td>She runs it daily; start weekly</td></tr>
+<tr><td>Formal property checks (state machines)</td><td><code>/pstack:create-formal-verification-skill</code> / <code>/pstack:maintain-formal-verification-skill</code></td><td>Property must fail on a broken variant</td></tr>
+<tr><td colspan="3"><strong>Shaping work</strong></td></tr>
+<tr><td>An incoming issue needs sorting</td><td><code>/triage</code></td><td>Reproduces bugs; writes an agent brief</td></tr>
+<tr><td>An idea needs alignment before code</td><td><code>/grill-with-docs</code> · <code>/grilling</code> · <code>/grill-me</code></td><td>with-docs also writes GLOSSARY + ADRs</td></tr>
+<tr><td>A vague task needs sharpening</td><td><code>/pstack:sharpen</code> · <code>/pstack:in-your-own-words</code></td><td></td></tr>
+<tr><td>A taste or state-model question needs a runnable answer</td><td><code>/handoff</code> → <code>/prototype</code></td><td>Throwaway branch</td></tr>
+<tr><td>Write the spec · break it into tickets</td><td><code>/to-spec</code> · <code>/to-tickets</code></td><td>You approve seams, slices, edges</td></tr>
+<tr><td>Huge, foggy project</td><td><code>/wayfinder</code></td><td>Decisions, not deliverables</td></tr>
+<tr><td colspan="3"><strong>Understanding code</strong></td></tr>
+<tr><td>How does X work / where should this live</td><td><code>/pstack:how</code></td><td></td></tr>
+<tr><td>Why is it this way / regression history</td><td><code>/pstack:why</code></td><td></td></tr>
+<tr><td>Rebuild my recent context</td><td><code>/pstack:recall</code></td><td></td></tr>
+<tr><td colspan="3"><strong>Building</strong></td></tr>
+<tr><td>Fix a bug, pstack way</td><td><code>/pstack:poteto-mode &lt;bug&gt;</code></td><td>Routes to Bug fix playbook (exercise 2)</td></tr>
+<tr><td>Fix a bug, Matt's way</td><td><code>/diagnosing-bugs</code></td><td>Build a red-capable feedback loop first</td></tr>
+<tr><td>Build a feature, pstack way</td><td><code>/pstack:poteto-mode &lt;feature&gt;</code></td><td>Feature playbook (exercise 4)</td></tr>
+<tr><td>Implement one ticket · a whole spec in parallel</td><td><code>/implement</code> · <code>/implement-spec</code></td><td>Exercise 3</td></tr>
+<tr><td>Test-first at agreed seams</td><td><code>/tdd</code> · <code>/pstack:tdd</code></td><td></td></tr>
+<tr><td>One-way-door design decision</td><td><code>/pstack:architect</code></td><td>Runs arena on type sketches</td></tr>
+<tr><td>Several valid shapes: race them</td><td><code>/pstack:arena</code></td><td></td></tr>
+<tr><td>Long run you step away from</td><td><code>/pstack:poteto-mode im going to bed…</code></td><td>Routes to <code>/pstack:figure-it-out</code></td></tr>
+<tr><td>Many parallel workers or verifiers</td><td><code>/pstack:swarm</code></td><td>Mind R4 budget: no wide fan-out</td></tr>
+<tr><td colspan="3"><strong>Checking and reviewing</strong></td></tr>
+<tr><td>Run the app and grade claims (fresh, read-only verifier)</td><td><code>/verify</code> <span class="pill r">repo</span></td><td>App code</td></tr>
+<tr><td>Validate scripts, evals, graders by executing them</td><td><code>/validate-work</code> <span class="pill r">repo</span></td><td>Non-app work</td></tr>
+<tr><td>What could this break beyond the diff</td><td><code>/pstack:blast-radius</code></td><td>Proves the one safety fact</td></tr>
+<tr><td>Review a branch: Standards + Spec</td><td><code>/code-review</code></td><td>Two axes, never merged</td></tr>
+<tr><td>Contested design: model-diverse reviewer panel</td><td><code>/pstack:interrogate</code></td><td></td></tr>
+<tr><td>Strip comments that justify workarounds</td><td><code>/pstack:no-comments</code></td><td>Spawns Comment Sicko</td></tr>
+<tr><td>Cut AI tells from prose</td><td><code>/pstack:unslop</code></td><td><code>/deslop</code> (code) is not installed</td></tr>
+<tr><td colspan="3"><strong>Shipping</strong></td></tr>
+<tr><td>Write the PR body (Evidence, Merge Danger)</td><td><code>/pr</code></td><td></td></tr>
+<tr><td>Gate + independent review + push + PR for a human</td><td><code>/ship-gate</code> <span class="pill r">repo</span></td><td>Does not read the verify verdict yet</td></tr>
+<tr><td colspan="3"><strong>Catching up and learning</strong></td></tr>
+<tr><td>Decision log / "catch me up on last night"</td><td><code>/pstack:show-me-your-work</code></td><td>Attention section by another model</td></tr>
+<tr><td>What is waiting on me</td><td><code>/pstack:ketchup</code></td><td></td></tr>
+<tr><td>End of session: fix the environment</td><td><code>/retro</code> · <code>/pstack:reflect</code></td><td>Reflect edits need your approval</td></tr>
+<tr><td>The same mistake happened twice</td><td><code>/pstack:correct</code></td><td>Architecture &gt; types/lint &gt; tests &gt; docs</td></tr>
+<tr><td>Automate a repeated manual task</td><td><code>/pstack:automate-me</code></td><td></td></tr>
+<tr><td>Architecture upkeep every few days</td><td><code>/improve-codebase-architecture</code></td><td></td></tr>
+<tr><td>Recurring prompt in this session · cloud cron</td><td><code>/loop</code> · <code>/schedule</code></td><td>Claude Code built-ins</td></tr>
+</table></div>
+</section>
+
+<!-- 9 -->
+<section id="path">
+<h2>9. Your path</h2>
+<h3>Settled decisions (grilling round 1)</h3>
+<div class="tablewrap"><table>
+<tr><th>#</th><th>Decision</th></tr>
+<tr><td>R1</td><td>Learn by using: run existing workflows supervised on real work before designing your own.</td></tr>
+<tr><td>R2</td><td>Pilot on a personal repo, not the work Spring Boot service.</td></tr>
+<tr><td>R3</td><td>Tan-style for low-risk tiers, Pocock-style for everything else. Never a dark factory.</td></tr>
+<tr><td>R4</td><td>Budget: Claude Max 5x, moderate use. Delegation fine; no swarms or unlimited fan-out.</td></tr>
+<tr><td>R5</td><td>Claude Code only for now; a second model family later.</td></tr>
+<tr><td>R6</td><td>Terms: Check, Verification, Verdict, Claim, Review, Author, Verifier. "Validation" retired.</td></tr>
+<tr><td>R7</td><td>Next phase is a curriculum: one lesson per stage (reading, pilot exercise, notes). Verify first.</td></tr>
+<tr><td>R8</td><td>The eventual workflow is a personal Claude Code plugin in its own repo, with per-repo recipes generated on demand. This repo is reference only.</td></tr>
+<tr><td>R9</td><td>Mix pstack and Pocock's skills during the pilot; log where they conflict and which side won.</td></tr>
+<tr><td>R10</td><td>Interactive Claude Code for the pilot; an unattended layer later. No external orchestrator.</td></tr>
+<tr><td>R11</td><td>Two personal pilot repos. You run setup in them yourself.</td></tr>
+<tr><td>R12</td><td>pstack model config stays as set up.</td></tr>
+<tr><td>R13</td><td>Exercise order (below).</td></tr>
+<tr><td>R14</td><td>Pilot notes stay local and are never committed.</td></tr>
+<tr><td>R15</td><td>Retro after the four exercises, not on a date.</td></tr>
+</table></div>
+
+<h3>The four pilot exercises, then the retro</h3>
+<div class="flow">
+  <div class="step"><span class="t">Verification skill</span><span class="cmd"><code>/pstack:create-verification-skill</code></span>Generate a control CLI, doctor and feature map for one of your pilot repos. Execute it once end to end before calling it done.<span class="gate">Can it return a FAIL? Plant a failure and see.</span></div>
+  <div class="step"><span class="t">Bug fix via pstack</span><span class="cmd"><code>/pstack:poteto-mode &lt;bug&gt;</code></span>Follow the Bug fix playbook (3a). Reproduce through the new control skill, verify on the same surface.<span class="gate">Repro must fail before the fix and pass after</span></div>
+  <div class="step"><span class="t">Feature via Pocock</span><span class="cmd"><code>/grill-with-docs</code> → <code>/to-spec</code> → <code>/to-tickets</code> → <code>/implement</code></span>Then <code>/code-review</code>, <code>/pr</code>, your QA (3d). Slot <code>/verify</code> in before your QA.<span class="gate">You approve seams and tickets; you merge</span></div>
+  <div class="step"><span class="t">Feature via pstack</span><span class="cmd"><code>/pstack:poteto-mode &lt;feature&gt;</code></span>Same kind of work, other side. Compare against exercise 3.<span class="gate">You still merge (R3: not yet a low-risk tier with a track record)</span></div>
+  <div class="step human"><span class="t">Retro</span><span class="cmd"><code>/retro</code> · <code>/pstack:reflect</code></span>Read your notes: where did pstack and Pocock conflict, and which side won? That decides what goes into your plugin.</div>
+</div>
+<div class="callout"><p>After the retro, the suggested order from the research: ship small verify improvements (verdict-gated ship, verifier-owned claims, SHA-bound running app), then the recipe generator on one real project, supervised. Only then one unattended run, with a tight done condition, on reversible work, with a morning audit.</p></div>
+<div class="callout human"><p><strong>Step-by-step instructions for each exercise</strong> (commands to run, what should fire, what to note, the per-stage lessons and the retro questions) are in <a href="curriculum.md">curriculum.md</a>.</p></div>
+<p class="srcs">Depth: <a href="decisions-to-grill.md">decisions-to-grill.md</a> (open questions and dissection-added decisions) <a href="README.md">README.md</a> (suggested learning path)</p>
+</section>
+
+<!-- 10 -->
+<section id="glossary">
+<h2>10. Glossary</h2>
+<h3>Canonical terms (from GLOSSARY.md)</h3>
+<div class="tablewrap"><table>
+<tr><th>Term</th><th>Meaning</th><th>Avoid</th></tr>
+<tr><td>Check</td><td>A deterministic gate (types, lint, tests, static analysis) whose pass/fail the implementing agent cannot edit.</td><td>Gate (alone), validation</td></tr>
+<tr><td>Verification</td><td>An agent that did not write the change runs the real application against claims fixed before the run and records evidence.</td><td>Validation, testing, QA</td></tr>
+<tr><td>Verdict</td><td>The outcome of one verification, bound to the exact code it judged, with evidence attached.</td><td>Result, report, sign-off</td></tr>
+<tr><td>Claim</td><td>One observable statement about the running application with an explicit expected observation, fixed before verification starts.</td><td>Assertion, test case, acceptance criterion</td></tr>
+<tr><td>Review</td><td>An agent or human reads the diff for quality and fit to the spec, without running the application.</td><td>Verification, code check</td></tr>
+<tr><td>Author</td><td>The agent that wrote the change. It never produces the Verdict on its own work.</td><td>Worker, implementer, owner</td></tr>
+<tr><td>Verifier</td><td>The agent that runs the application and produces the Verdict, with no write access to the code or the claims.</td><td>Grader, judge, tester</td></tr>
+</table></div>
+<h3>Other terms used in this guide</h3>
+<div class="tablewrap"><table class="plain">
+<tr><th>Term</th><th>Meaning</th></tr>
+<tr><td><strong>Software factory</strong></td><td>A setup where agents write the code and also decide whether it merges; humans own intent, harness and risk policy.</td></tr>
+<tr><td><strong>Dark factory</strong></td><td>The extreme: no human reads the code or the review. Pocock treats it as a failure mode; you ruled it out (R3).</td></tr>
+<tr><td><strong>AFK / HITL</strong></td><td>Away-from-keyboard vs human-in-the-loop. Pocock encodes the split as <code>ready-for-agent</code> vs <code>ready-for-human</code> labels.</td></tr>
+<tr><td><strong>Done predicate</strong></td><td>A falsifiable condition re-checked every iteration. "A duration is not a finish condition."</td></tr>
+<tr><td><strong>Control CLI / control skill</strong></td><td>A small per-app tool that boots and drives the real app (CDP, Playwright, tmux), with a <code>doctor</code> check.</td></tr>
+<tr><td><strong>Feature map</strong></td><td>A per-app list of user flows and how to prove each; the standing oracle for regressions. "Materialized memory."</td></tr>
+<tr><td><strong>Protocol vs recipe</strong></td><td>Protocol: who grades, what is read-only, verdict format (<code>verify</code>). Recipe: how to run <em>this</em> app (<code>verify-&lt;app&gt;</code>).</td></tr>
+<tr><td><strong>Live lane</strong></td><td>The verifier lane that drives the running app. pstack: no clean verdict without it.</td></tr>
+<tr><td><strong>Swarm</strong></td><td>N parallel fresh workers or verifiers with a selection rule declared before spawning.</td></tr>
+<tr><td><strong><code>git patch-id</code></strong></td><td>A hash of a diff ignoring line numbers and commit metadata; lets a verdict survive a clean rebase but not a code change. Use <code>--verbatim</code>.</td></tr>
+<tr><td><strong>Decision log</strong></td><td><code>decisions.tsv</code> (ts, phase, decision, why, evidence, result), one row per iteration, audited in the morning.</td></tr>
+<tr><td><strong>gates.md</strong></td><td>Parked questions for the human, each with a "default on no answer", so the run never blocks.</td></tr>
+<tr><td><strong>Frontier</strong></td><td>The set of work (or decisions) whose prerequisites are settled: unblocked tickets, or the next grilling questions.</td></tr>
+<tr><td><strong>Tracer-bullet slice</strong></td><td>A narrow but complete path through every layer, sized to one fresh context window.</td></tr>
+<tr><td><strong>Holdout scenarios / digital twins</strong></td><td>StrongDM: tests kept outside the repo so agents can't edit them; fake third-party services to run them against.</td></tr>
+<tr><td><strong>One-way / two-way door</strong></td><td>Irreversible vs cheaply reversible change. One-way doors stay human (T3).</td></tr>
+<tr><td><strong>Backpressure</strong></td><td>Ralph's term for checks (types, tests, scanners) that push back on the loop. Pocock avoids the word because it lumps checks with review.</td></tr>
+</table></div>
+</section>
+
+<footer>
+<p>Built from the markdown research in this folder, dated 2026-10-24. Figures and quotes are as the sources state them (practitioner numbers are self-reported). Where this guide and a source disagree, the source wins: <a href="README.md">README.md</a> · <a href="workflow-map.md">workflow-map.md</a> · <a href="GLOSSARY.md">GLOSSARY.md</a> · <a href="decisions-to-grill.md">decisions-to-grill.md</a></p>
+</footer>
+</main>
+
+<script>
+/* Optional: highlight the current section in the nav, and open all <details> for printing. */
+(function () {
+  var links = document.querySelectorAll('nav.top a');
+  var map = {};
+  links.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  if ('IntersectionObserver' in window) {
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting && map[e.target.id]) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          map[e.target.id].classList.add('active');
+          var a = map[e.target.id], ul = a.closest('ul');
+          if (ul) { ul.scrollLeft = a.offsetLeft - ul.clientWidth / 2 + a.offsetWidth / 2; }
+        }
+      });
+    }, { rootMargin: '-30% 0px -65% 0px' });
+    document.querySelectorAll('main > section[id]').forEach(function (s) { obs.observe(s); });
+  }
+  window.addEventListener('beforeprint', function () {
+    document.querySelectorAll('details').forEach(function (d) { d.setAttribute('open', ''); });
+  });
+})();
+</script>
+</body>
+</html>
