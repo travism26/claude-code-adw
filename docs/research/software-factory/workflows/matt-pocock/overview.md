@@ -4,6 +4,7 @@
 **Question:** How does Matt Pocock run agentic development end to end, and in particular how does he handle verification, feedback loops and AFK (away-from-keyboard) autonomous coding? The goal is a comparison against Lauren Tan's (poteto) pstack and this repo's own skills, as input for building our own version.
 **Method:** I read the installed skills under `~/.agents/skills/` (symlinked from `~/.claude/skills/`), and checked their provenance against `~/.agents/.skill-lock.json` and upstream `mattpocock/skills`. I read the `mattpocock/sandcastle` README, its templates, and the repo's own `.sandcastle/` workflows through `gh api`, plus `mattpocock/dictionary-of-ai-coding` entries. I also read the AI Hero Ralph article, the AI Engineer Europe 2026 talk page, and the Pragmatic Engineer episode page.
 **Companion docs (not repeated here):** `docs/research/verification-loop-research.md` covers the poteto livestream, the verifier-design rules and the evidence ladder. `docs/research/seven-phase-workflow-research.md` covers how the seven-phase flow compares with Spec Kit, Kiro and Task Master, and Huntley's own warnings about Ralph.
+**Dissections:** [../../dissections/matt-pocock/software-factory-skill.md](../../dissections/matt-pocock/software-factory-skill.md) covers his draft `software-factory` skill (mattpocock/skills#1316): the factory vocabulary, the brakes, the 5 questions per task and the slot surveys.
 
 ---
 

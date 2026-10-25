@@ -39,6 +39,7 @@
 | [dissections/poteto/shipping-merge-authority.md](dissections/poteto/shipping-merge-authority.md) | How a non-author verdict tied to the patch (`git patch-id --verbatim`) authorizes a merge; verdict format and `verdict_check.py` for ship-gate |
 | [dissections/poteto/overnight-contract.md](dissections/poteto/overnight-contract.md) | The bedtime contract, iteration loop, decision log, hourly audit and morning brief; an `adw night` design with a Spring example |
 | [dissections/poteto/orchestrate-reconcile-loop.md](dissections/poteto/orchestrate-reconcile-loop.md) | The orchestrate plugin's queue, exit codes, failure classes and stuck detection (and its defects); an ADW queue driver design |
+| [dissections/matt-pocock/software-factory-skill.md](dissections/matt-pocock/software-factory-skill.md) | Matt's draft `software-factory` glossary skill: Task, Trigger, Run, Runner and the service slots; "start slow" brakes; the 5 questions per task; his slots mapped onto Claude Code + GitHub, and where "remote only, stateless runs" conflicts with R10 |
 | `dissections/TEMPLATE.md` | Outline for further dissections (backlog in `workflow-map.md` §6) |
 
 Earlier, related notes: [../verification-loop-research.md](../verification-loop-research.md) and [../feedback-loop-practices-research.md](../feedback-loop-practices-research.md).
