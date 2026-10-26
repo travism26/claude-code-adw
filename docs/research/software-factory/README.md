@@ -26,6 +26,7 @@
 | [workflows/poteto/pstack-mechanics.md](workflows/poteto/pstack-mechanics.md) | pstack internals: the overnight contract, playbooks, merge discipline, liveness rules |
 | [workflows/poteto/cursor-native-pieces.md](workflows/poteto/cursor-native-pieces.md) | What lives outside the Claude Code build: benny automations, the orchestrate plugin, the cursor-team-kit control tools, advisor, thermos; with Claude Code equivalents |
 | [workflows/matt-pocock/overview.md](workflows/matt-pocock/overview.md) | Matt's pipeline (grill, spec, tickets, implement, review, PR), his Ralph / `sandcastle` AFK loop, and his "day shift / night shift" human gates |
+| [workflows/matt-pocock/course-software-factories.md](workflows/matt-pocock/course-software-factories.md) | Matt's paid cohort "Software Factories for Real Engineers": public syllabus, price, outcomes, mapping to our dissections and curriculum, employer pitch |
 | [workflows/adw/overview.md](workflows/adw/overview.md) | Our own pipeline: what works, what's broken, and what's missing for an unattended night |
 
 **Level 2: verification, decisions, dissections**
