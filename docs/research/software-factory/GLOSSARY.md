@@ -73,3 +73,27 @@ _Avoid_: Dispatcher, scheduler, control plane
 **Observability platform**:
 Where Runners send logs, traces and status so a human can see inside each Run. Optional, since the Runner's or Orchestrator's own run pages often suffice.
 _Avoid_: Monitoring, dashboard, logs
+
+## Codebase shape
+
+From Lauren Tan's Dune contract ([dissection](dissections/poteto/dune-contract-agent-friendly-codebase.md)) and the [agent-friendly codebase survey](concepts/agent-friendly-codebase.md).
+
+**Mechanical boundary**:
+A dependency rule that a Check enforces on the resolved import or module graph, with an error that names the allowed path. The wrong import fails before Review sees it.
+_Avoid_: Architecture guideline, convention, lint (alone)
+
+**Feature folder**:
+One directory that owns everything a feature needs (UI, logic, tests), so new product work adds files there instead of editing shared roots.
+_Avoid_: Module (alone), package, component
+
+**Reserved-file discovery**:
+The framework finds a feature's entrypoints by file name or location, so no shared registry has to be edited to add one.
+_Avoid_: Auto-registration, magic, plugin system
+
+**Single writer**:
+The one module allowed to change a given piece of durable state. Everything else reads it or sends that module a command.
+_Avoid_: Owner (alone), source of truth, store
+
+**Gardener**:
+The human who turns repeated agent mistakes into Checks and deletes the patterns agents shouldn't copy, so the codebase gets stricter one correction at a time.
+_Avoid_: Maintainer, reviewer, tech lead
