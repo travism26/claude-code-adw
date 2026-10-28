@@ -15,6 +15,7 @@
 |---|---|
 | [workflow-map.md](workflow-map.md) | Six workflows (Poteto, Pocock, StrongDM, Ralph, Anthropic harness, our ADW) compared stage by stage: where they conflict, where they agree, a borrow sheet for ADW, and the dissection backlog |
 | [concepts/software-factory-concept.md](concepts/software-factory-concept.md) | What the hype term means, where it came from (StrongDM, Shapiro's levels, Ralph, OpenAI, Cursor), the common architecture, costs, evidence against it, and Spring / Rust / Node notes |
+| [concepts/agent-friendly-codebase.md](concepts/agent-friendly-codebase.md) | How to shape a repo so agents can merge their own PRs: the field (OpenAI, Anthropic, Factory, Cursor, Pocock), mechanical boundaries per stack with tested configs, and an **agent-readiness audit** you can run on any repo |
 
 **Level 1: one workflow at a time**
 
@@ -40,6 +41,7 @@
 | [dissections/poteto/shipping-merge-authority.md](dissections/poteto/shipping-merge-authority.md) | How a non-author verdict tied to the patch (`git patch-id --verbatim`) authorizes a merge; verdict format and `verdict_check.py` for ship-gate |
 | [dissections/poteto/overnight-contract.md](dissections/poteto/overnight-contract.md) | The bedtime contract, iteration loop, decision log, hourly audit and morning brief; an `adw night` design with a Spring example |
 | [dissections/poteto/orchestrate-reconcile-loop.md](dissections/poteto/orchestrate-reconcile-loop.md) | The orchestrate plugin's queue, exit codes, failure classes and stuck detection (and its defects); an ADW queue driver design |
+| [dissections/poteto/dune-contract-agent-friendly-codebase.md](dissections/poteto/dune-contract-agent-friendly-codebase.md) | Lauren Tan's Dune contract: five agent tendencies, five rules, five nouns; the import-graph CI behind her frame-budget story; each rule mapped to pstack and Pocock |
 | [dissections/matt-pocock/software-factory-skill.md](dissections/matt-pocock/software-factory-skill.md) | Matt's draft `software-factory` glossary skill: Task, Trigger, Run, Runner and the service slots; "start slow" brakes; the 5 questions per task; his slots mapped onto Claude Code + GitHub, and where "remote only, stateless runs" conflicts with R10 |
 | `dissections/TEMPLATE.md` | Outline for further dissections (backlog in `workflow-map.md` §6) |
 
