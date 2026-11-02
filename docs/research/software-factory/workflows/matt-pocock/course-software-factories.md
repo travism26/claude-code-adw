@@ -3,6 +3,7 @@
 **URL:** https://www.aihero.dev/cohorts/software-factories-for-real-engineers-xdy1m
 **Date fetched:** 2026-10-26
 **Note:** This is a paid course. This file records only what the public sales page shows (via a summarising fetch, so treat wording as close paraphrase). No paid lesson content was accessed. Prices and dates may change.
+**Update 2026-11-02:** the page was edited on 2026-10-29 and now lists eight named workshops, including "Software Factory Part One" and "Software Factory Part Two". The lesson-level prediction, with evidence per row, is in [../../matt-pocock-course/course-prediction.md](../../matt-pocock-course/course-prediction.md). The content below is the 2026-10-26 snapshot and is kept as the baseline.
 
 ## Logistics
 
