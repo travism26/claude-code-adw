@@ -2,11 +2,11 @@
 
 **Source workflow:** Pocock  **Stages:** Intake, Dispatch/Isolate, Review, Merge, Operate/Monitor, Human gates, Liveness
 **Primary sources:**
-- [mattpocock/skills#1316](https://github.com/mattpocock/skills/pull/1316), "software-factory: glossary skill for designing a factory" (draft, unmerged, opened 2026-10-21, head `b59cab4`). Read with `gh pr view 1316 -R mattpocock/skills`, `gh pr diff 1316 -R mattpocock/skills`, and the PR's review comments through `gh api`.
+- [mattpocock/skills#1316](https://github.com/mattpocock/skills/pull/1316), "software-factory: glossary skill for designing a factory" (opened 2026-10-21 as a draft at head `b59cab4`; merged unchanged on 2026-10-31 as `4ae2317`). Read with `gh pr view 1316 -R mattpocock/skills`, `gh pr diff 1316 -R mattpocock/skills`, and the PR's review comments through `gh api`.
 - Files in the PR, all under `skills/in-progress/software-factory/`: `SKILL.md`, `EXAMPLE-TASKS.md`, `TICKET-TRACKERS.md`, `GIT-HOSTS.md`, `RUNNERS.md`, `OBSERVABILITY-PLATFORMS.md`.
 - Comparison context: [../../workflows/matt-pocock/overview.md](../../workflows/matt-pocock/overview.md), [../../concepts/claude-code-as-harness.md](../../concepts/claude-code-as-harness.md), [../../decisions-to-grill.md](../../decisions-to-grill.md) (Settled R1–R15), [../../GLOSSARY.md](../../GLOSSARY.md), the root `CONTEXT.md`, and the poteto dissections in [../poteto/](../poteto/).
 
-I read the PR only. I ran nothing. The PR is a draft, so any wording below may change before it merges.
+I read the PR only. I ran nothing. **Update 2026-11-02:** the PR merged on 2026-10-31 with every file byte-identical to `b59cab4`, so this dissection describes the merged skill. The packaging bug in §5 is still open as [issue #1373](https://github.com/mattpocock/skills/issues/1373). The course-side follow-up (what the skill is for, the GitHub Actions factory, a game plan for ADW) is in [../../matt-pocock-course/](../../matt-pocock-course/README.md).
 
 ---
 
@@ -249,7 +249,7 @@ ADW's `trigger_cron.py` and `factory.py` act as a self-built orchestrator over a
 
 ## 10. Unknowns
 
-- **Draft and unmerged.** Terms or decisions may change. The course's Part Two scripts still use trigger / state / workflow / action, and aligning them is parked.
+- **Merged unchanged on 2026-10-31** (was: draft and unmerged). The course's Part Two scripts still use trigger / state / workflow / action, and aligning them is parked.
 - **Does merge ever leave the human?** Every example task ends in human merge, but "open the throttle as the brakes earn trust" is not explained further. The course material may answer it.
 - **Interactive work.** The skill doesn't say where supervised local sessions sit. "Remote only" suggests they are outside the factory. I inferred that, and it isn't stated.
 - **`/schedule` triggers.** Whether routines can fire on issue labels (not just PR and release events) decides whether `/schedule` alone can fill the orchestrator slot. Check the routines docs on your build.

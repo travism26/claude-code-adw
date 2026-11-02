@@ -28,6 +28,7 @@
 | [workflows/poteto/cursor-native-pieces.md](workflows/poteto/cursor-native-pieces.md) | What lives outside the Claude Code build: benny automations, the orchestrate plugin, the cursor-team-kit control tools, advisor, thermos; with Claude Code equivalents |
 | [workflows/matt-pocock/overview.md](workflows/matt-pocock/overview.md) | Matt's pipeline (grill, spec, tickets, implement, review, PR), his Ralph / `sandcastle` AFK loop, and his "day shift / night shift" human gates |
 | [workflows/matt-pocock/course-software-factories.md](workflows/matt-pocock/course-software-factories.md) | Matt's paid cohort "Software Factories for Real Engineers": public syllabus, price, outcomes, mapping to our dissections and curriculum, employer pitch |
+| [matt-pocock-course/](matt-pocock-course/README.md) | **2026-11-02 follow-up.** A catalogue of his skills PRs (Oct to Nov 2026), the `chief-of-staff` skill and companions, how his GitHub Actions orchestration works, the predicted structure of the 2026-11-09 course (labelled as prediction), and a game plan for adopting the factory on top of ADW |
 | [workflows/adw/overview.md](workflows/adw/overview.md) | Our own pipeline: what works, what's broken, and what's missing for an unattended night |
 
 **Level 2: verification, decisions, dissections**
@@ -42,7 +43,7 @@
 | [dissections/poteto/overnight-contract.md](dissections/poteto/overnight-contract.md) | The bedtime contract, iteration loop, decision log, hourly audit and morning brief; an `adw night` design with a Spring example |
 | [dissections/poteto/orchestrate-reconcile-loop.md](dissections/poteto/orchestrate-reconcile-loop.md) | The orchestrate plugin's queue, exit codes, failure classes and stuck detection (and its defects); an ADW queue driver design |
 | [dissections/poteto/dune-contract-agent-friendly-codebase.md](dissections/poteto/dune-contract-agent-friendly-codebase.md) | Lauren Tan's Dune contract: five agent tendencies, five rules, five nouns; the import-graph CI behind her frame-budget story; each rule mapped to pstack and Pocock |
-| [dissections/matt-pocock/software-factory-skill.md](dissections/matt-pocock/software-factory-skill.md) | Matt's draft `software-factory` glossary skill: Task, Trigger, Run, Runner and the service slots; "start slow" brakes; the 5 questions per task; his slots mapped onto Claude Code + GitHub, and where "remote only, stateless runs" conflicts with R10 |
+| [dissections/matt-pocock/software-factory-skill.md](dissections/matt-pocock/software-factory-skill.md) | Matt's `software-factory` glossary skill (merged unchanged 2026-10-31): Task, Trigger, Run, Runner and the service slots; "start slow" brakes; the 5 questions per task; his slots mapped onto Claude Code + GitHub, and where "remote only, stateless runs" conflicts with R10 |
 | `dissections/TEMPLATE.md` | Outline for further dissections (backlog in `workflow-map.md` §6) |
 
 Earlier, related notes: [../verification-loop-research.md](../verification-loop-research.md) and [../feedback-loop-practices-research.md](../feedback-loop-practices-research.md).
