@@ -25,3 +25,20 @@ alongside `ready-for-agent` rather than replacing it, and only a human removes i
 [Claiming a Ticket](issue-tracker.md#claiming-a-ticket-in-progress).
 
 Edit the right-hand column to match whatever vocabulary you actually use.
+
+## Review labels
+
+The factory's Review task ([docs/factory/README.md](../factory/README.md)) puts these on pull
+requests from agent branches:
+
+| Label      | Meaning                                                                   |
+| ---------- | ------------------------------------------------------------------------- |
+| `rework`   | Review found a blocker: fix what the review named                         |
+| `rework:1` | Review has blocked this PR once                                           |
+| `rework:2` | Review has blocked this PR twice                                          |
+| `rework:3` | Review has blocked this PR three times; the next blocker goes to a human  |
+
+After `rework:3`, the next blocker labels the PR `ready-for-human`, and the factory stops.
+
+Every label in this file is in `adws/actions/labels.json`. To create the labels, or correct them on
+the repo, run `uv run adws/actions/sync_labels.py --apply`.

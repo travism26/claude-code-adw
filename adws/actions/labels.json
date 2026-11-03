@@ -1,0 +1,23 @@
+{
+  "_comment": "The factory's label vocabulary. Edit here, then run `uv run adws/actions/sync_labels.py --apply`. Meanings: docs/agents/triage-labels.md.",
+  "labels": [
+    {"name": "needs-triage", "color": "d876e3", "description": "Maintainer needs to evaluate this issue"},
+    {"name": "needs-info", "color": "d4c5f9", "description": "Waiting on reporter for more information"},
+    {"name": "ready-for-agent", "color": "0e8a16", "description": "Fully specified, ready for an AFK agent"},
+    {"name": "ready-for-human", "color": "1d76db", "description": "Requires human implementation"},
+    {"name": "wontfix", "color": "ffffff", "description": "This will not be worked on"},
+    {"name": "in-progress", "color": "fbca04", "description": "Claimed: a run or session is working on it"},
+    {"name": "bug", "color": "d73a4a", "description": "Something isn't working"},
+    {"name": "chore", "color": "c5def5", "description": "Plan type for a Ticket run: maintenance work"},
+    {"name": "feature", "color": "a2eeef", "description": "Plan type for a Ticket run: new behaviour"},
+    {"name": "rework", "color": "e99695", "description": "Factory review found a blocker: fix what the review named"},
+    {"name": "rework:1", "color": "f9d0c4", "description": "Factory review blocked this PR once"},
+    {"name": "rework:2", "color": "f9d0c4", "description": "Factory review blocked this PR twice"},
+    {"name": "rework:3", "color": "f9d0c4", "description": "Factory review blocked this PR three times; the next blocker goes to a human"},
+    {"name": "wayfinder:map", "color": "5319e7", "description": "Wayfinding map: notes, decisions so far and fog"},
+    {"name": "wayfinder:research", "color": "c2e0c6", "description": "Wayfinding child ticket: research"},
+    {"name": "wayfinder:prototype", "color": "c2e0c6", "description": "Wayfinding child ticket: prototype"},
+    {"name": "wayfinder:grilling", "color": "c2e0c6", "description": "Wayfinding child ticket: grilling"},
+    {"name": "wayfinder:task", "color": "c2e0c6", "description": "Wayfinding child ticket: task"}
+  ]
+}

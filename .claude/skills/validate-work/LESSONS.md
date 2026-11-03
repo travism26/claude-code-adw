@@ -4,6 +4,22 @@ Read top-to-bottom before every validation; apply every applicable Rule.
 Append new entries at the top (format in SKILL.md). Merge duplicate rules;
 consolidate when past ~30 rules.
 
+## 2026-11-03 — a spend cap is checked between turns, not enforced as a ceiling
+Context: validating the factory Review step's `--max-budget-usd` cap
+Miss: unit tests with a faked agent showed a failed run fails the step, but
+only a real run at `--max-budget-usd 0.01` showed two facts the fakes could
+not: the run spent $0.04 to $0.055, because the cap is checked after each
+turn, and the error the harness surfaced was "Unknown error".
+Rule: validate a cap or limit with a real run at a tiny value; record what it
+actually spent and read the error a user would see, not only the exit code.
+
+## 2026-11-03 — scripted edits can silently convert CRLF files
+Context: editing adws/ADW_SETUP_GUIDE.md and the trigger scripts with Python
+Miss: Python's text mode turned CRLF into LF, so a 20-line edit showed as
+1,000+ changed lines; only `git diff --stat` revealed it.
+Rule: after any scripted edit, run `git diff --stat`; a whole-file diff means
+the line endings changed. Read and write with `newline=''` to keep them.
+
 ## 2026-08-04 — `--help` on a hand-rolled CLI can start a real run
 Context: validating the .ports.env leak fix; smoke-tested the entrypoint with
 `uv run adws/travis/travis_sdlc.py --help`

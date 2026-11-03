@@ -612,30 +612,33 @@ uv run adw_ship_iso.py 123 abc12345
 
 ### Automated Triggers
 
+Both triggers start the same thing, a Ticket run: `uv run adws/travis/travis_sdlc.py <N> --worktree --risk-gate`
+(`adw_triggers/ticket_launch.py`). The Ticket resolver inside it refuses any issue that is not labelled
+`ready-for-agent`, is already `in-progress`, or has an open Blocker, so a trigger can only start work a human
+has approved. For runs on GitHub Actions instead, see [docs/factory/README.md](../docs/factory/README.md).
+
 #### Cron Polling (Every 20 seconds)
 
 ```bash
-cd adws/
-uv run adw_triggers/trigger_cron.py
+uv run adws/adw_triggers/trigger_cron.py
 ```
 
-**Triggers on:**
-- New issues with no comments
-- Any issue where latest comment is exactly "adw"
+**Triggers on:** open issues labelled `ready-for-agent` and not `in-progress`, one run at a time. A refused
+or failed issue is retried after ten minutes.
 
 #### Webhook Server (Real-time)
 
 ```bash
-cd adws/
-uv run adw_triggers/trigger_webhook.py
+uv run adws/adw_triggers/trigger_webhook.py
 ```
+
+**Triggers on:** an `issues` event that adds the `ready-for-agent` label. Everything else is ignored.
 
 **Configure in GitHub:**
 1. Go to repo Settings → Webhooks → Add webhook
 2. Payload URL: `https://your-domain.com/gh-webhook`
 3. Content type: `application/json`
-4. Events: Issues, Issue comments
-5. Secret: Set `GITHUB_WEBHOOK_SECRET` in `.env`
+4. Events: Issues
 
 **Expose local webhook (development):**
 ```bash

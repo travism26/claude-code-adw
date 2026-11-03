@@ -6,248 +6,67 @@
 """
 GitHub Webhook Trigger - AI Developer Workflow (ADW)
 
-FastAPI webhook endpoint that receives GitHub issue events and triggers ADW workflows.
-Responds immediately to meet GitHub's 10-second timeout by launching workflows
-in the background. Supports both standard and isolated workflows.
+FastAPI endpoint for GitHub `issues` webhooks. When an issue is labelled
+ready-for-agent it starts `travis_sdlc.py <N> --worktree --risk-gate`
+(adw_triggers/ticket_launch.py) in the background and answers at once, inside
+GitHub's 10-second timeout. Every other event is ignored.
 
-Usage: uv run trigger_webhook.py
+The payload is not trusted to decide anything: the Ticket resolver inside
+travis_sdlc re-reads the issue from GitHub and refuses it unless it is labelled
+ready-for-agent, not in-progress, and free of open Blockers. Only someone with
+triage access to the repo can apply a label in the first place.
 
-Environment Requirements:
-- PORT: Server port (default: 8001)
-- All workflow requirements (GITHUB_PAT, ANTHROPIC_API_KEY, etc.)
+Usage: uv run adws/adw_triggers/trigger_webhook.py
+
+Environment: PORT (default 8001), plus what a Ticket run needs (gh and
+Claude Code logged in, or GITHUB_PAT).
 """
 
 import os
 import subprocess
 import sys
+
 from fastapi import FastAPI, Request
 from dotenv import load_dotenv
 import uvicorn
 
-# Add parent directory to path for imports
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from adw_modules.utils import make_adw_id, setup_logger, get_safe_subprocess_env
-from adw_modules.github import make_issue_comment, ADW_BOT_IDENTIFIER
-from adw_modules.workflow_ops import extract_adw_info
-from adw_modules.state import ADWState
+from adw_modules.ticket_resolver import READY_LABEL  # noqa: E402
+from adw_triggers.ticket_launch import (  # noqa: E402
+    REPO_ROOT, ticket_run_command, ticket_run_env, ticket_to_run)
 
-# Load environment variables
 load_dotenv()
 
-# Configuration
 PORT = int(os.getenv("PORT", "8001"))
 
-# Dependent workflows that require existing worktrees
-# These cannot be triggered directly via webhook
-DEPENDENT_WORKFLOWS = [
-    "adw_build_iso",
-    "adw_test_iso",
-    "adw_review_iso",
-    "adw_document_iso",
-    "adw_ship_iso",
-]
-
-# Create FastAPI app
 app = FastAPI(
     title="ADW Webhook Trigger", description="GitHub webhook endpoint for ADW"
 )
-
-print(f"Starting ADW Webhook Trigger on port {PORT}")
 
 
 @app.post("/gh-webhook")
 async def github_webhook(request: Request):
     """Handle GitHub webhook events."""
+    event_type = request.headers.get("X-GitHub-Event", "")
     try:
-        # Get event type from header
-        event_type = request.headers.get("X-GitHub-Event", "")
-
-        # Parse webhook payload
         payload = await request.json()
+    except Exception:
+        return {"status": "ignored", "reason": "body is not JSON"}
 
-        # Extract event details
-        action = payload.get("action", "")
-        issue = payload.get("issue", {})
-        issue_number = issue.get("number")
+    number = ticket_to_run(event_type, payload)
+    if number is None:
+        return {"status": "ignored",
+                "reason": f"not an issue labelled {READY_LABEL} (event={event_type}, "
+                          f"action={payload.get('action', '')})"}
 
-        print(
-            f"Received webhook: event={event_type}, action={action}, issue_number={issue_number}"
-        )
-
-        workflow = None
-        provided_adw_id = None
-        model_set = None
-        trigger_reason = ""
-        content_to_check = ""
-
-        # Check if this is an issue opened event
-        if event_type == "issues" and action == "opened" and issue_number:
-            issue_body = issue.get("body", "")
-            content_to_check = issue_body
-
-            # Ignore issues from ADW bot to prevent loops
-            if ADW_BOT_IDENTIFIER in issue_body:
-                print("Ignoring ADW bot issue to prevent loop")
-                workflow = None
-            # Check if body contains "adw_"
-            elif "adw_" in issue_body.lower():
-                # Use temporary ID for classification
-                temp_id = make_adw_id()
-                extraction_result = extract_adw_info(issue_body, temp_id)
-                if extraction_result.has_workflow:
-                    workflow = extraction_result.workflow_command
-                    provided_adw_id = extraction_result.adw_id
-                    model_set = extraction_result.model_set
-                    trigger_reason = f"New issue with {workflow} workflow"
-
-        # Check if this is an issue comment
-        elif event_type == "issue_comment" and action == "created" and issue_number:
-            comment = payload.get("comment", {})
-            comment_body = comment.get("body", "")
-            content_to_check = comment_body
-
-            print(f"Comment body: '{comment_body}'")
-
-            # Ignore comments from ADW bot to prevent loops
-            if ADW_BOT_IDENTIFIER in comment_body:
-                print("Ignoring ADW bot comment to prevent loop")
-                workflow = None
-            # Check if comment contains "adw_"
-            elif "adw_" in comment_body.lower():
-                # Use temporary ID for classification
-                temp_id = make_adw_id()
-                extraction_result = extract_adw_info(comment_body, temp_id)
-                if extraction_result.has_workflow:
-                    workflow = extraction_result.workflow_command
-                    provided_adw_id = extraction_result.adw_id
-                    model_set = extraction_result.model_set
-                    trigger_reason = f"Comment with {workflow} workflow"
-
-        # Validate workflow constraints
-        if workflow in DEPENDENT_WORKFLOWS:
-            if not provided_adw_id:
-                print(
-                    f"{workflow} is a dependent workflow that requires an existing ADW ID"
-                )
-                print(f"Cannot trigger {workflow} directly via webhook without ADW ID")
-                workflow = None
-                # Post error comment to issue
-                try:
-                    make_issue_comment(
-                        str(issue_number),
-                        f"❌ Error: `{workflow}` is a dependent workflow that requires an existing ADW ID.\n\n"
-                        "To run this workflow, you must provide the ADW ID in your comment, for example:\n"
-                        f"`{workflow} adw-12345678`\n\n"
-                        "The ADW ID should come from a previous workflow run (like `adw_plan_iso` or `adw_patch_iso`).",
-                    )
-                except Exception as e:
-                    print(f"Failed to post error comment: {e}")
-
-        if workflow:
-            # Use provided ADW ID or generate a new one
-            adw_id = provided_adw_id or make_adw_id()
-
-            # If ADW ID was provided, update/create state file
-            if provided_adw_id:
-                # Try to load existing state first
-                state = ADWState.load(provided_adw_id)
-                if state:
-                    # Update issue_number and model_set if state exists
-                    state.update(issue_number=str(issue_number), model_set=model_set)
-                else:
-                    # Only create new state if it doesn't exist
-                    state = ADWState(provided_adw_id)
-                    state.update(
-                        adw_id=provided_adw_id,
-                        issue_number=str(issue_number),
-                        model_set=model_set,
-                    )
-                state.save("webhook_trigger")
-            else:
-                # Create new state for newly generated ADW ID
-                state = ADWState(adw_id)
-                state.update(
-                    adw_id=adw_id, issue_number=str(issue_number), model_set=model_set
-                )
-                state.save("webhook_trigger")
-
-            # Set up logger
-            logger = setup_logger(adw_id, "webhook_trigger")
-            logger.info(
-                f"Detected workflow: {workflow} from content: {content_to_check[:100]}..."
-            )
-            if provided_adw_id:
-                logger.info(f"Using provided ADW ID: {provided_adw_id}")
-
-            # Post comment to issue about detected workflow
-            try:
-                make_issue_comment(
-                    str(issue_number),
-                    f"🤖 ADW Webhook: Detected `{workflow}` workflow request\n\n"
-                    f"Starting workflow with ID: `{adw_id}`\n"
-                    f"Workflow: `{workflow}` 🏗️\n"
-                    f"Model Set: `{model_set}` ⚙️\n"
-                    f"Reason: {trigger_reason}\n\n"
-                    f"Logs will be available at: `agents/{adw_id}/{workflow}/`",
-                )
-            except Exception as e:
-                logger.warning(f"Failed to post issue comment: {e}")
-
-            # Build command to run the appropriate workflow
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            adws_dir = os.path.dirname(script_dir)
-            repo_root = os.path.dirname(adws_dir)  # Go up to repository root
-            trigger_script = os.path.join(adws_dir, f"{workflow}.py")
-
-            cmd = ["uv", "run", trigger_script, str(issue_number), adw_id]
-
-            print(f"Launching {workflow} for issue #{issue_number}")
-            print(f"Command: {' '.join(cmd)} (reason: {trigger_reason})")
-            print(f"Working directory: {repo_root}")
-
-            # Launch in background using Popen with filtered environment
-            subprocess.Popen(
-                cmd,
-                cwd=repo_root,  # Run from repository root where .claude/commands/ is located
-                # Filtered env + risk gate: nobody is watching a webhook-triggered
-                # run, so high-risk tool calls are denied (adw_modules/risk_gate.py).
-                # ADW_DRAFT_PR gives travis_sdlc-based workflows a reviewable,
-                # human-gated draft PR (adw_modules/draft_pr.py); ADW_ISSUE_NUMBER
-                # lets the PR body link the originating issue.
-                env={**get_safe_subprocess_env(), "ADW_RISK_GATE": "1",
-                     "ADW_DRAFT_PR": "1", "ADW_ISSUE_NUMBER": str(issue_number)},
-                start_new_session=True,
-            )
-
-            print(
-                f"Background process started for issue #{issue_number} with ADW ID: {adw_id}"
-            )
-            print(f"Logs will be written to: agents/{adw_id}/{workflow}/execution.log")
-
-            # Return immediately
-            return {
-                "status": "accepted",
-                "issue": issue_number,
-                "adw_id": adw_id,
-                "workflow": workflow,
-                "message": f"ADW {workflow} triggered for issue #{issue_number}",
-                "reason": trigger_reason,
-                "logs": f"agents/{adw_id}/{workflow}/",
-            }
-        else:
-            print(
-                f"Ignoring webhook: event={event_type}, action={action}, issue_number={issue_number}"
-            )
-            return {
-                "status": "ignored",
-                "reason": f"Not a triggering event (event={event_type}, action={action})",
-            }
-
-    except Exception as e:
-        print(f"Error processing webhook: {e}")
-        # Always return 200 to GitHub to prevent retries
-        return {"status": "error", "message": "Internal error processing webhook"}
+    cmd = ticket_run_command(number)
+    print(f"Starting a Ticket run for #{number}: {' '.join(cmd)}")
+    # Background, own session: the run outlives this request.
+    subprocess.Popen(cmd, cwd=REPO_ROOT, env=ticket_run_env(), start_new_session=True)
+    return {"status": "accepted", "issue": number,
+            "message": f"Ticket run started for #{number}; the resolver decides "
+                       "whether it may proceed"}
 
 
 @app.get("/health")

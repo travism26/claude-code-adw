@@ -1,0 +1,35 @@
+# The Rework task's trigger, with no agent behind it yet (docs/factory/README.md).
+#
+# Review labels a blocked PR `rework` with the factory App's token. That label
+# event starts this workflow, which proves the hop works: a label added with
+# GITHUB_TOKEN would start nothing. Until automated rework is built, a human
+# fixes what the review named and pushes, and Review runs again.
+
+name: Rework
+
+on:
+  pull_request:
+    types: [labeled]
+
+permissions: {}
+
+jobs:
+  rework:
+    if: github.event.label.name == 'rework'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Record the hand-off
+        env:
+          PR: ${{ github.event.pull_request.number }}
+          SENDER: ${{ github.event.sender.login }}
+        run: |
+          {
+            echo "## Rework requested on PR #$PR"
+            echo
+            echo "Labelled \`rework\` by \`$SENDER\`. This run starting at all shows that"
+            echo "label events from the factory App start workflows."
+            echo
+            echo "Automated rework is not built yet. Fix what the review comment names"
+            echo "and push; Review runs again on the push."
+          } >> "$GITHUB_STEP_SUMMARY"
