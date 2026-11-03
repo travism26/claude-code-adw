@@ -59,6 +59,9 @@ class AgentPromptRequest(BaseModel):
     # not a politeness request — the incident pipeline uses it to make read-only
     # lenses (e.g. ["Edit", "Write", "NotebookEdit", "Bash"]) unable to mutate.
     disallowed_tools: Optional[List[str]] = None
+    # Dollar cap for this invocation (--max-budget-usd). Unattended runs on an
+    # API key set it so one run cannot spend past its budget.
+    max_budget_usd: Optional[float] = None
 
 
 class AgentPromptResponse(BaseModel):
@@ -194,6 +197,17 @@ def disallowed_tools_args(request: "AgentPromptRequest") -> List[str]:
     if not tools:
         return []
     return ["--disallowedTools", ",".join(tools)]
+
+
+def max_budget_args(request: "AgentPromptRequest") -> List[str]:
+    """CLI args capping the invocation's spend. [] when unset; a cap that is
+    not positive is refused rather than passed through as "no cap"."""
+    budget = request.max_budget_usd
+    if budget is None:
+        return []
+    if budget <= 0:
+        raise ValueError(f"max_budget_usd must be positive, got {budget}")
+    return ["--max-budget-usd", f"{budget:g}"]
 
 
 def is_zero_turn_failure(result_message: Dict[str, Any], result_text: str) -> bool:
@@ -590,6 +604,7 @@ def prompt_claude_code(request: AgentPromptRequest) -> AgentPromptResponse:
     # Structural tool denial (read-only lenses etc.) — binds even under
     # --dangerously-skip-permissions, see AgentPromptRequest.disallowed_tools.
     cmd.extend(disallowed_tools_args(request))
+    cmd.extend(max_budget_args(request))
 
     # Explicitly enable project and user skills
     cmd.extend(["--setting-sources", "project,user"])

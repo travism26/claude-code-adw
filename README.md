@@ -103,7 +103,8 @@ adws/                       # The harness (copy this into target projects)
 │   └── MEMORY_CONTRACT.md  # Memory store format, injection, dreaming rules
 ├── adw_*.py                # Single-shot entry points (prompt, slash command,
 │                           #   chore/feature implement, plan-build-test-review)
-├── adw_triggers/           # Webhook + cron invocation
+├── adw_triggers/           # Webhook + cron invocation (start a Ticket run)
+├── actions/                # Steps the GitHub Actions factory runs (review, labels)
 └── adw_tests/              # Harness self-tests
 
 template_claude/            # Slash-command templates with {{PLACEHOLDER}} tokens
@@ -499,6 +500,8 @@ from how leading coding-agent teams work, is in `evals/EVAL_PRACTICES.md`.
 - `adws/README.md` — harness architecture and philosophy
 - `adws/ADW_SETUP_GUIDE.md` — detailed setup, phases, parallel worktree execution
 - `adws/building-llm-powered-workflows.md` — workflow design patterns
+- `docs/factory/README.md` — the factory on GitHub Actions: the Review task, the rework cap, labels
+- `docs/factory/github-app-setup.md` — set up the factory's GitHub App, secrets and labels
 
 ## Related concepts and keywords
 
