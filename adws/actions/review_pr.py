@@ -53,8 +53,11 @@ MAX_REWORK = 3
 MODELS = ("sonnet", "opus", "haiku")
 # Everything that could change a file, run a command or reach the network.
 # The reviewer keeps Read, Grep and Glob.
+# /proc is denied too: the agent's own environment holds the API key. A Read
+# rule covers every file-reading tool (Grep and Glob included).
 DENIED_TOOLS = ("Bash", "Edit", "Write", "NotebookEdit", "WebFetch", "WebSearch",
-                "Agent", "Task")
+                "Agent", "Task", "Read(//proc/**)")
+SECRET_ENV = ("ANTHROPIC_API_KEY",)
 MARKER = "<!-- factory:review -->"
 
 _COUNTER_RE = re.compile(r"^rework:(\d+)$")
@@ -211,7 +214,9 @@ def prepare(args, prs: Optional[PrClient] = None, issues: Optional[GhClient] = N
                         body=issue.get("body") or "", labels=(),
                         url=issue.get("url") or "")
         ctx["ticket_ref"] = ticket.ref
-        spec = resolve_spec(ticket, args.code_dir, issues)
+        # A Spec file is read from the base checkout (cwd), never the PR head,
+        # so a PR cannot edit the Spec it is judged against.
+        spec = resolve_spec(ticket, os.getcwd(), issues)
         ctx["spec_ref"], ctx["spec_warning"] = spec.ref, spec.warning
         if spec.kind == "issue":
             spec_repo, spec_number = spec.issue_coordinates()
@@ -221,7 +226,7 @@ def prepare(args, prs: Optional[PrClient] = None, issues: Optional[GhClient] = N
                     f"# {spec_issue.get('title', '')}\n\n{spec_issue.get('body') or ''}\n")
                 ctx["spec_path"] = str(out / "spec.md")
         elif spec.kind == "file" and spec.warning is None:
-            ctx["spec_path"] = str(Path(args.code_dir) / spec.ref)
+            ctx["spec_path"] = spec.ref
     (out / "context.json").write_text(json.dumps(ctx, indent=2) + "\n")
     print(f"Prepared PR {args.repo}#{args.pr} at {args.head_sha[:12]}: "
           f"Ticket {ctx['ticket_ref'] or 'none'}, Spec {ctx['spec_ref'] or 'none'}, "
@@ -244,6 +249,23 @@ def _result_message(transcript: Path) -> dict:
     return result
 
 
+def scrub_secrets(out: Path, env=None) -> int:
+    """Blank every secret value from the step's env out of the files in out,
+    before anything is posted or uploaded. Returns how many files changed."""
+    env = os.environ if env is None else env
+    secrets = [env[k] for k in SECRET_ENV if len(env.get(k) or "") >= 8]
+    changed = 0
+    for f in (p for p in out.rglob("*") if p.is_file()):
+        text = f.read_text(errors="replace")
+        clean = text
+        for s in secrets:
+            clean = clean.replace(s, "[REDACTED]")
+        if clean != text:
+            f.write_text(clean)
+            changed += 1
+    return changed
+
+
 def review(args, run_agent: Callable = prompt_claude_code) -> int:
     out = Path(args.out)
     ctx = json.loads((out / "context.json").read_text())
@@ -264,6 +286,15 @@ def review(args, run_agent: Callable = prompt_claude_code) -> int:
         disallowed_tools=list(DENIED_TOOLS),
         max_budget_usd=args.max_budget_usd,
     ))
+    try:
+        return _record_review(args, out, ctx, transcript, resp)
+    finally:
+        if scrub_secrets(out):
+            print("::warning title=Secret scrubbed::The review's files held a secret value; "
+                  "it was redacted")
+
+
+def _record_review(args, out: Path, ctx: dict, transcript: Path, resp) -> int:
     if not resp.success:
         result = _result_message(transcript)
         if result.get("subtype") == "error_max_budget_usd":

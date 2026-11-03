@@ -12,6 +12,8 @@ Nobody watches a triggered run, so it always gets an isolated worktree
 any child that reads the env).
 """
 
+import hashlib
+import hmac
 import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional
@@ -64,3 +66,12 @@ def due_tickets(issues, attempts: Dict[int, float], now: float,
             continue
         due.append(issue.number)
     return sorted(due)
+
+
+def valid_signature(secret: str, body: bytes, header: str) -> bool:
+    """GitHub's X-Hub-Signature-256 check. No secret configured is never valid:
+    an unauthenticated endpoint would let anyone start runs."""
+    if not secret or not header or not header.startswith("sha256="):
+        return False
+    expected = hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(expected, header[len("sha256="):])

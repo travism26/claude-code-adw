@@ -23,7 +23,7 @@ Review run fails with a message saying what is missing. It never goes green with
 
 | Question | Answer |
 |---|---|
-| 1. Trigger | `pull_request`: `ready_for_review`, `synchronize`, `reopened`. The job runs only when the PR is not a draft, its branch is `adw/*` in this repo (not a fork), its author is an `OWNER`, `MEMBER` or `COLLABORATOR`, and it is not labelled `ready-for-human`. |
+| 1. Trigger | `pull_request_target`: `ready_for_review`, `synchronize`, `reopened`. The job runs only when the PR is not a draft, its branch is `adw/*` in this repo (not a fork), its author is an `OWNER`, `MEMBER` or `COLLABORATOR`, and it is not labelled `ready-for-human`. |
 | 2. Does | `prepare` (App token, no agent) writes the diff, the Ticket the PR body closes (`Closes #N`) and the Ticket's parent Spec to files. `review` (API key, no GitHub token) runs one agent in a fresh context with Read, Grep and Glob only. It has no shell, no write tools and no web access, and `--max-budget-usd` caps its spend. `apply` (App token, no agent) posts the Spec and Standards reports as one PR comment and moves the labels. |
 | 3. Triggers next | On a Spec blocker, it adds `rework`. That starts `rework.yml`. |
 | 4. Human re-enters | At the merge, always. After three rework rounds, the next blocker labels the PR `ready-for-human`, and Review skips the PR from then on. |
@@ -55,11 +55,15 @@ labels. The review of the new head decides them.
 
 ### Trust boundaries
 
-- The harness that runs the review is checked out from the PR's base commit. A PR cannot change
-  the code that judges it. The PR's own code is checked out under `pr/`, where the reviewer reads
-  it but never runs it.
-- The agent's step has the Anthropic key and nothing else. The steps that hold the App token run
-  no agent.
+- Review runs on `pull_request_target`. The workflow file and the harness both come from the base
+  branch, so a PR cannot rewrite the review that judges it. The PR's own code is checked out under
+  `pr/`, where the reviewer reads it but never runs it. Fork PRs are never reviewed.
+- A Spec file named by the Ticket is read from the base branch too, so a PR cannot edit its own Spec.
+- The agent's step has the Anthropic key and no GitHub token. The steps that hold the App token run
+  no agent. The agent cannot read `/proc`, where its own environment lives. As a second guard, the key
+  is scrubbed from every file the review wrote before anything is posted or uploaded.
+- When the PR closes no Ticket, its own description is the requirement. For a Ticket run that never
+  happens, but a hand-opened `adw/*` PR is reviewed against what its author wrote.
 - No step ends in `|| true`. A step that cannot do its job fails the run, so a red run means the
   brake did not engage.
 
@@ -108,3 +112,6 @@ Each later Task workflow (Verify, Ratchet, Implement) should follow the same sha
 - **Implement on `ready-for-agent`** (phase 4). When it comes, its PRs will be opened by the App, and
   the `author_association` guard will need to admit the App's bot account.
 - **Ratchet, Explore, Fix, Retro** (phases 3 and 4).
+- **The local webhook's claim race.** Two signed deliveries for one issue at the same moment can both
+  pass the resolver before either labels it `in-progress`. GitHub sends one delivery per label event,
+  so this needs a replayed or duplicated delivery.

@@ -13,6 +13,7 @@ Usage:
     uv run pytest adws/adw_tests/test_triggers.py -q
 """
 
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -92,6 +93,20 @@ def test_the_webhook_runs_only_an_issue_labelled_ready(event, payload, expected)
     assert ticket_launch.ticket_to_run(event, payload) == expected
 
 
+def _sign(secret, body):
+    import hashlib, hmac
+    return "sha256=" + hmac.new(secret.encode(), body, hashlib.sha256).hexdigest()
+
+
+def test_only_a_correct_signature_is_valid():
+    body = b'{"a": 1}'
+    assert ticket_launch.valid_signature("s3cret", body, _sign("s3cret", body))
+    assert not ticket_launch.valid_signature("s3cret", body, _sign("other", body))
+    assert not ticket_launch.valid_signature("s3cret", body + b" ", _sign("s3cret", body))
+    assert not ticket_launch.valid_signature("", body, _sign("", body))
+    assert not ticket_launch.valid_signature("s3cret", body, "")
+
+
 def test_the_webhook_starts_the_ticket_run_in_the_background(monkeypatch):
     pytest.importorskip("fastapi")
     pytest.importorskip("httpx")
@@ -102,14 +117,24 @@ def test_the_webhook_starts_the_ticket_run_in_the_background(monkeypatch):
     started = []
     monkeypatch.setattr(trigger_webhook.subprocess, "Popen",
                         lambda cmd, **kw: started.append((cmd, kw)))
+    monkeypatch.setenv("GITHUB_WEBHOOK_SECRET", "s3cret")
     client = TestClient(trigger_webhook.app)
+
+    def post(event, payload, secret="s3cret"):
+        body = json.dumps(payload).encode()
+        return client.post("/gh-webhook", content=body, headers={
+            "X-GitHub-Event": event, "X-Hub-Signature-256": _sign(secret, body),
+            "Content-Type": "application/json"})
+
     event, payload = _labeled("ready-for-agent", number=31)
-    r = client.post("/gh-webhook", json=payload, headers={"X-GitHub-Event": event})
+    forged = post(event, payload, secret="wrong")
+    assert forged.status_code == 401 and started == []
+    r = post(event, payload)
     assert r.json()["status"] == "accepted" and r.json()["issue"] == 31
     cmd, kw = started[0]
     assert cmd == ticket_launch.ticket_run_command(31)
     assert kw["start_new_session"] is True and kw["env"]["ADW_RISK_GATE"] == "1"
 
     event, payload = _labeled("wontfix")
-    r = client.post("/gh-webhook", json=payload, headers={"X-GitHub-Event": event})
+    r = post(event, payload)
     assert r.json()["status"] == "ignored" and len(started) == 1

@@ -11,22 +11,26 @@ ready-for-agent it starts `travis_sdlc.py <N> --worktree --risk-gate`
 (adw_triggers/ticket_launch.py) in the background and answers at once, inside
 GitHub's 10-second timeout. Every other event is ignored.
 
-The payload is not trusted to decide anything: the Ticket resolver inside
+Every request must carry a valid X-Hub-Signature-256 for GITHUB_WEBHOOK_SECRET;
+without the secret set, every request is refused. Even then the payload is not
+trusted to decide anything: the Ticket resolver inside
 travis_sdlc re-reads the issue from GitHub and refuses it unless it is labelled
 ready-for-agent, not in-progress, and free of open Blockers. Only someone with
 triage access to the repo can apply a label in the first place.
 
 Usage: uv run adws/adw_triggers/trigger_webhook.py
 
-Environment: PORT (default 8001), plus what a Ticket run needs (gh and
+Environment: GITHUB_WEBHOOK_SECRET (required), PORT (default 8001), plus what a Ticket run needs (gh and
 Claude Code logged in, or GITHUB_PAT).
 """
 
+import json
 import os
 import subprocess
 import sys
 
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 import uvicorn
 
@@ -34,7 +38,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from adw_modules.ticket_resolver import READY_LABEL  # noqa: E402
 from adw_triggers.ticket_launch import (  # noqa: E402
-    REPO_ROOT, ticket_run_command, ticket_run_env, ticket_to_run)
+    REPO_ROOT, ticket_run_command, ticket_run_env, ticket_to_run, valid_signature)
 
 load_dotenv()
 
@@ -49,8 +53,14 @@ app = FastAPI(
 async def github_webhook(request: Request):
     """Handle GitHub webhook events."""
     event_type = request.headers.get("X-GitHub-Event", "")
+    body = await request.body()
+    if not valid_signature(os.getenv("GITHUB_WEBHOOK_SECRET", ""), body,
+                           request.headers.get("X-Hub-Signature-256", "")):
+        return JSONResponse(status_code=401, content={
+            "status": "refused", "reason": "missing or invalid X-Hub-Signature-256 "
+                                           "(is GITHUB_WEBHOOK_SECRET set?)"})
     try:
-        payload = await request.json()
+        payload = json.loads(body)
     except Exception:
         return {"status": "ignored", "reason": "body is not JSON"}
 

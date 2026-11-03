@@ -19,8 +19,11 @@
 
 name: Review
 
+# pull_request_target, not pull_request: the workflow file and the harness
+# always come from the base branch, so a PR cannot rewrite the brake that
+# judges it. The PR's code is checked out under pr/ as data and never run.
 on:
-  pull_request:
+  pull_request_target:
     types: [ready_for_review, synchronize, reopened]
 
 permissions: {}
@@ -63,6 +66,7 @@ jobs:
     steps:
       # The harness that runs the review comes from the base branch, so a PR
       # cannot change the code judging it. The PR's own code goes under pr/.
+      # Fork PRs never get here (the job's `if:`), so no fork code is fetched.
       - name: Check out the harness (base branch)
         uses: actions/checkout@v7
         with:

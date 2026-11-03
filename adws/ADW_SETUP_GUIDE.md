@@ -638,7 +638,9 @@ uv run adws/adw_triggers/trigger_webhook.py
 1. Go to repo Settings → Webhooks → Add webhook
 2. Payload URL: `https://your-domain.com/gh-webhook`
 3. Content type: `application/json`
-4. Events: Issues
+4. Secret: a long random string; set the same value as `GITHUB_WEBHOOK_SECRET` in `.env`. The server
+   refuses every request without a valid signature, and every request when the variable is unset.
+5. Events: Issues
 
 **Expose local webhook (development):**
 ```bash

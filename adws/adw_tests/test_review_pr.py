@@ -133,6 +133,26 @@ def test_the_reviewer_cannot_write_run_commands_or_overspend(tmp_path):
     assert json.loads((out / "findings.json").read_text())["spec_findings"][0]["kind"] == "missing_requirement"
 
 
+def test_the_reviewer_cannot_read_its_own_environment():
+    assert "Read(//proc/**)" in review_pr.DENIED_TOOLS
+
+
+def test_a_leaked_key_is_scrubbed_before_posting(tmp_path):
+    key = "sk-ant-api03-SECRETSECRET"
+    out = tmp_path / "review-out"
+    _context(out)
+    args = SimpleNamespace(out=str(out), model="sonnet", max_budget_usd=2.0)
+    leaked = _findings(spec=[{**BLOCKER, "description": f"env says {key}"}])
+    import os
+    os.environ["ANTHROPIC_API_KEY"] = key
+    try:
+        review_pr.review(args, run_agent=lambda r: SimpleNamespace(success=True, output=json.dumps(leaked)))
+    finally:
+        del os.environ["ANTHROPIC_API_KEY"]
+    assert key not in (out / "findings.json").read_text()
+    assert review_pr.scrub_secrets(out, {"ANTHROPIC_API_KEY": key}) == 0
+
+
 def test_a_failed_or_unparseable_review_fails_the_step(tmp_path):
     out = tmp_path / "review-out"
     _context(out)
@@ -209,11 +229,12 @@ def _git_repo(path: Path):
     return base, git("rev-parse", "HEAD")
 
 
-def test_prepare_gathers_the_diff_ticket_and_spec_file(tmp_path):
+def test_prepare_reads_the_spec_file_from_the_base_not_the_pr(tmp_path, monkeypatch):
     code = tmp_path / "pr"
     base, head = _git_repo(code)
-    (code / "docs").mkdir()
-    (code / "docs/spec.md").write_text("spec")
+    (tmp_path / "docs").mkdir()
+    (tmp_path / "docs/spec.md").write_text("spec")
+    monkeypatch.chdir(tmp_path)
     prs = FakePrs({"title": "t", "body": "Closes #25", "url": "u"})
     issues = FakeIssues({25: {"title": "Cap rework", "body": "Spec: docs/spec.md\n\n## Acceptance criteria\n- cap"}})
     args = SimpleNamespace(repo=REPO, pr=40, base_sha=base, head_sha=head,
@@ -224,7 +245,7 @@ def test_prepare_gathers_the_diff_ticket_and_spec_file(tmp_path):
     assert (out / "ticket.md").read_text().startswith("# Cap rework")
     ctx = json.loads((out / "context.json").read_text())
     assert ctx["ticket_ref"] == f"{REPO}#25" and ctx["spec_ref"] == "docs/spec.md"
-    assert ctx["spec_path"] == str(code / "docs/spec.md")
+    assert ctx["spec_path"] == "docs/spec.md" and ctx["spec_warning"] is None
 
 
 def test_prepare_fails_when_the_closed_ticket_cannot_be_read(tmp_path):
