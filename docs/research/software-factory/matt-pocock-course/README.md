@@ -30,3 +30,4 @@
 - [../dissections/matt-pocock/software-factory-skill.md](../dissections/matt-pocock/software-factory-skill.md): status updated from draft to merged unchanged; the packaging bug is now [issue #1373](https://github.com/mattpocock/skills/issues/1373).
 - [../workflows/matt-pocock/course-software-factories.md](../workflows/matt-pocock/course-software-factories.md): an update note pointing here; the 2026-10-26 snapshot is kept as the baseline.
 - [../README.md](../README.md): a row for this folder, and the dissection row no longer says "draft".
+- [github-actions-orchestration.md](github-actions-orchestration.md): section 11 added on 2026-11-04. It records Matt Pocock's LinkedIn post on starting software factories with GitHub Actions (seen on LinkedIn, no URL) and maps its seven points to the findings above. The post confirms the Actions findings and the Part One then Part Two shape, so no bullet in "The findings in one page" changed.
