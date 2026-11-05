@@ -70,6 +70,8 @@ _Avoid_: Forge, code host, repo
 The component that receives Triggers, starts Runs on Runners, and records which Runs are queued, in flight or finished.
 _Avoid_: Dispatcher, scheduler, control plane
 
+A leadership-session diagram uses "control plane" for identity, policy, spend, and audit. That is a different object from the Orchestrator. The collision is spelled out in [enterprise-agent-planes](../enterprise-agent-planes/README.md).
+
 **Observability platform**:
 Where Runners send logs, traces and status so a human can see inside each Run. Optional, since the Runner's or Orchestrator's own run pages often suffice.
 _Avoid_: Monitoring, dashboard, logs

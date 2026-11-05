@@ -48,6 +48,8 @@
 
 Earlier, related notes: [../verification-loop-research.md](../verification-loop-research.md) and [../feedback-loop-practices-research.md](../feedback-loop-practices-research.md).
 
+**Distinct topic, not part of this curriculum:** [enterprise agent planes](../enterprise-agent-planes/README.md) reads five October 13, 2026 leadership-session photos (control plane, intelligence plane, harness) against this repo and against primary measurements of cost, latency, and quality. It does not change the workflow map above.
+
 ## The big picture in one page
 
 **A software factory is a pipeline where agents write the code *and* decide whether it merges.** Humans own the intent (specs, scenarios), the harness, and the risk policy. The hard part is not generating code. It is trusting code nobody read. Every serious practitioner arrives at the same answer: **verification by something other than the author, against an oracle the author cannot edit, producing evidence instead of claims.**
