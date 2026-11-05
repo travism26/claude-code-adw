@@ -50,7 +50,7 @@ Slide 20's product, "control × (knowledge + memory + learning)," says the same 
 | Output judge | A second opinion on prose quality, preferably from a different model family, with the bias measured | Whether tests passed, whether a policy held, whether a path exists. |
 | Data layer | Optional scoring inside the database if a measured workload shows a gain under the same entitlements | The enforcement of those entitlements. In-database inference does not replace them. No public result located for this note shows a joint gain. |
 
-Putting a model in all ten boxes raises a second cost the slide does not draw: each learned step adds a failure probability and a bill. Independent multi-agent layouts amplify trace-level errors; extra stages do not commute. See [cost-quality-evidence.md](cost-quality-evidence.md) §1 and §8.
+Putting a model in all ten boxes raises a second cost the slide does not draw: each learned step adds a failure probability and a bill. Independent multi-agent layouts amplify trace-level errors; extra stages do not commute. The measurement is in [cost-quality-evidence.md](cost-quality-evidence.md) §0, and the release-gate reading of it is in §8.
 
 ## 4. Trust boundaries the drawing implies
 
