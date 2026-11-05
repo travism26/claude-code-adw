@@ -502,6 +502,8 @@ from how leading coding-agent teams work, is in `evals/EVAL_PRACTICES.md`.
 - `adws/building-llm-powered-workflows.md` — workflow design patterns
 - `docs/factory/README.md` — the factory on GitHub Actions: the Review task, the rework cap, labels
 - `docs/factory/github-app-setup.md` — set up the factory's GitHub App, secrets and labels
+- `docs/research/software-factory/README.md` — research on autonomous coding workflows (how to read it)
+- `docs/research/enterprise-agent-planes/README.md` — research note on a three-plane enterprise-agent diagram, compared with this harness and with published cost and quality measurements
 
 ## Related concepts and keywords
 
